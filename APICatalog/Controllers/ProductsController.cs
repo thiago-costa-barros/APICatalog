@@ -70,18 +70,37 @@ namespace APICatalog.Controllers
                 return NotFound("Product not found...");
             }
 
-            existingProduct.ProductName = product.ProductName;
-            existingProduct.Description = product.Description;
-            existingProduct.Category = product.Category;
-            existingProduct.ImageUrl = product.ImageUrl;
-            existingProduct.Price = product.Price;
-            existingProduct.CategoryId = product.CategoryId;
-            existingProduct.UpdateDate = DateTime.Now;
+            existingProduct.ProductName = product.ProductName ?? existingProduct.ProductName;
+            existingProduct.Description = product.Description ?? existingProduct.Description;
+            existingProduct.ImageUrl = product.ImageUrl ?? existingProduct.ImageUrl;
+            existingProduct.Price = product.Price != 0 ? product.Price : existingProduct.Price;
+            existingProduct.CategoryId = product.CategoryId ?? existingProduct.CategoryId;
+            existingProduct.UpdateDate = DateTime.UtcNow;
 
             _context.Products.Update(existingProduct);
             _context.SaveChanges();
 
             return Ok(existingProduct);
+        }
+
+        [HttpDelete("{id:int}")]
+        public ActionResult DeleteProduct(int id)
+        {
+            var existingProduct = _context.Products
+                .FirstOrDefault(p => p.ProductId == id && p.DeletionDate == null);
+
+            if (existingProduct == null)
+            {
+                return NotFound("Product not found...");
+            }
+
+            existingProduct.DeletionDate = DateTime.UtcNow;
+            existingProduct.UpdateDate = DateTime.UtcNow;
+
+            _context.Products.Update(existingProduct);
+            _context.SaveChanges();
+
+            return Ok($"Product with id {id} was deleted successfully...");
         }
     }
 }
