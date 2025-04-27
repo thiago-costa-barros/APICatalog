@@ -1,0 +1,2 @@
+﻿Run Database in docker
+docker run --restart=always --name postgres-apicatalog -e POSTGRES_PASSWORD=hash12345678@@ -p 5433:5432 -d postgres
