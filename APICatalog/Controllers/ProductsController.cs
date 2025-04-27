@@ -100,7 +100,7 @@ namespace APICatalog.Controllers
             _context.Products.Update(existingProduct);
             _context.SaveChanges();
 
-            return Ok($"Product with id {id} was deleted successfully...");
+            return Ok($"Product '{existingProduct.ProductName}' was deleted successfully...");
         }
     }
 }
