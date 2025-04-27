@@ -20,6 +20,7 @@ namespace APICatalog.Controllers
         public ActionResult<IEnumerable<Product>> GetAllProducts()
         {
             var products = _context.Products
+                .Where(p => p.DeletionDate == null)
                 .ToList();
 
             if (products.Count() < 1)
@@ -33,7 +34,7 @@ namespace APICatalog.Controllers
         public ActionResult<Product> GetProductById(int id)
         {
             var product = _context.Products
-                .FirstOrDefault(p => p.ProductId == id);
+                .FirstOrDefault(p => p.ProductId == id && p.DeletionDate == null);
             if (product == null)
             {
                 return NotFound("Product not found...");
@@ -51,6 +52,36 @@ namespace APICatalog.Controllers
             _context.Products.Add(product);
             _context.SaveChanges();
             return CreatedAtRoute("GetProductById", new { id = product.ProductId }, product);
+        }
+
+        [HttpPut("{id:int}")]
+        public ActionResult<Product> UpdateProduct(int id, [FromBody] Product product)
+        {
+            if (product == null || product.ProductId != id)
+            {
+                BadRequest("Product data is invalid.");
+            }
+
+            var existingProduct = _context.Products
+                .FirstOrDefault(p => p.ProductId == id && p.DeletionDate == null);
+
+            if (existingProduct == null)
+            {
+                return NotFound("Product not found...");
+            }
+
+            existingProduct.ProductName = product.ProductName;
+            existingProduct.Description = product.Description;
+            existingProduct.Category = product.Category;
+            existingProduct.ImageUrl = product.ImageUrl;
+            existingProduct.Price = product.Price;
+            existingProduct.CategoryId = product.CategoryId;
+            existingProduct.UpdateDate = DateTime.Now;
+
+            _context.Products.Update(existingProduct);
+            _context.SaveChanges();
+
+            return Ok(existingProduct);
         }
     }
 }
