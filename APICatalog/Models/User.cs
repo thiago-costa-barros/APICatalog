@@ -1,6 +1,8 @@
-﻿namespace APICatalog.Models;
+﻿using APICatalog.Models.Base;
 
-public class User
+namespace APICatalog.Models;
+
+public class User: BaseEntity
 {
     public int UserId { get; set; }
     public string? UserName { get; set; }
@@ -10,9 +12,4 @@ public class User
     public bool IsActive { get; set; }
     public bool IsStaff { get; set; }
     public bool IsAdmin { get; set; }
-    public DateTime CreationDate { get; set; }
-    public DateTime UpdateDate { get; set; }
-    public DateTime? DeletionDate { get; set; }
-    public int? CreationUserId { get; set; }
-    public int? UpdateUserId { get; set; }
 }
