@@ -84,7 +84,7 @@ namespace APICatalog.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        public ActionResult DeleteProduct(int id)
+        public ActionResult RemoveProduct(int id)
         {
             var existingProduct = _context.Products
                 .FirstOrDefault(p => p.ProductId == id && p.DeletionDate == null);
