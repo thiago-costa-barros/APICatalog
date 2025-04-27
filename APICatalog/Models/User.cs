@@ -9,7 +9,7 @@ public class User: BaseEntity
     public string? Password { get; set; }
     public string? Email { get; set; }
     public string? Phone { get; set; }
-    public bool IsActive { get; set; }
-    public bool IsStaff { get; set; }
-    public bool IsAdmin { get; set; }
+    public bool IsActive { get; set; } = true;
+    public bool IsStaff { get; set; } = false;
+    public bool IsAdmin { get; set; } = false;
 }
