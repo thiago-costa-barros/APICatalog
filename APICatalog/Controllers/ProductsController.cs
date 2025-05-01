@@ -57,10 +57,12 @@ namespace APICatalog.Controllers
         [HttpPut("{id:int}")]
         public ActionResult<Product> UpdateProduct(int id, [FromBody] Product product)
         {
-            if (product == null || product.ProductId != id)
+            if (product == null)
             {
-                BadRequest("Product data is invalid.");
+                return BadRequest("Product data is invalid.");
             }
+
+            product.ProductId = id;
 
             var existingProduct = _context.Products
                 .FirstOrDefault(p => p.ProductId == id && p.DeletionDate == null);
