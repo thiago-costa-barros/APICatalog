@@ -17,7 +17,7 @@ namespace APICatalog.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Product>> GetAllProducts()
+        public ActionResult<Product> GetAllProducts()
         {
             try
             {
@@ -30,7 +30,7 @@ namespace APICatalog.Controllers
                 {
                     return NotFound("Product not found...");
                 }
-                return products;
+                return Ok(products);
             }
             catch (Exception)
             {
@@ -50,7 +50,7 @@ namespace APICatalog.Controllers
                 {
                     return NotFound("Product not found...");
                 }
-                return product;
+                return Ok(product);
             }
             catch (Exception)
             {

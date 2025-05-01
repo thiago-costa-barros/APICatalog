@@ -17,7 +17,7 @@ namespace APICatalog.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Category>> GetAllCategories()
+        public ActionResult<Category> GetAllCategories()
         {
             try
             {
@@ -29,7 +29,7 @@ namespace APICatalog.Controllers
                 {
                     return NotFound("Category not found...");
                 }
-                return categories;
+                return Ok(categories);
             }
             catch (Exception)
             {
@@ -40,7 +40,7 @@ namespace APICatalog.Controllers
         }
 
         [HttpGet("products")]
-        public ActionResult<IEnumerable<Category>> GetAllCategoriesWithProducts()
+        public ActionResult<Category> GetAllCategoriesWithProducts()
         {
             try
             {
@@ -53,7 +53,7 @@ namespace APICatalog.Controllers
                 {
                     return NotFound("Category not found...");
                 }
-                return categories;
+                return Ok(categories);
             }
             catch (Exception)
             {
@@ -73,7 +73,7 @@ namespace APICatalog.Controllers
                 {
                     return NotFound("Category not found...");
                 }
-                return category;
+                return Ok(category);
             }
             catch (Exception)
             {
