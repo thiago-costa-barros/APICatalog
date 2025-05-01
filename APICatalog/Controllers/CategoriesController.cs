@@ -1,6 +1,7 @@
 ﻿using APICatalog.Context;
 using APICatalog.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace APICatalog.Controllers
 {
@@ -19,6 +20,20 @@ namespace APICatalog.Controllers
         public ActionResult<IEnumerable<Category>> GetAllCategories()
         {
             var categories = _context.Categories
+                .Where(c => c.DeletionDate == null)
+                .ToList();
+            if (categories.Count() < 1)
+            {
+                return NotFound("Category not found...");
+            }
+            return categories;
+        }
+
+        [HttpGet("products")]
+        public ActionResult<IEnumerable<Category>> GetAllCategoriesWithProducts()
+        {
+            var categories = _context.Categories
+                .Include(c => c.Products.Where(p => p.DeletionDate == null))
                 .Where(c => c.DeletionDate == null)
                 .ToList();
             if (categories.Count() < 1)
