@@ -19,102 +19,151 @@ namespace APICatalog.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Category>> GetAllCategories()
         {
-            var categories = _context.Categories
+            try
+            {
+                var categories = _context.Categories
                 .Where(c => c.DeletionDate == null)
                 .AsNoTracking()
                 .ToList();
-            if (categories.Count() < 1)
-            {
-                return NotFound("Category not found...");
+                if (categories.Count() < 1)
+                {
+                    return NotFound("Category not found...");
+                }
+                return categories;
             }
-            return categories;
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+
         }
 
         [HttpGet("products")]
         public ActionResult<IEnumerable<Category>> GetAllCategoriesWithProducts()
         {
-            var categories = _context.Categories
+            try
+            {
+                var categories = _context.Categories
                 .Include(c => c.Products.Where(p => p.DeletionDate == null))
                 .Where(c => c.DeletionDate == null)
                 .AsNoTracking()
                 .ToList();
-            if (categories.Count() < 1)
-            {
-                return NotFound("Category not found...");
+                if (categories.Count() < 1)
+                {
+                    return NotFound("Category not found...");
+                }
+                return categories;
             }
-            return categories;
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpGet("{id:int}", Name = "GetCategoryById")]
         public ActionResult<Category> GetCategoryById(int id)
         {
-            var category = _context.Categories
-                .FirstOrDefault(c => c.CategoryId == id && c.DeletionDate == null);
-            if (category == null)
+            try
             {
-                return NotFound("Category not found...");
+                var category = _context.Categories
+                .FirstOrDefault(c => c.CategoryId == id && c.DeletionDate == null);
+                if (category == null)
+                {
+                    return NotFound("Category not found...");
+                }
+                return category;
             }
-            return category;
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpPost]
         public ActionResult<Category> InsertCategory([FromBody] Category category)
         {
-            if (category == null)
+            try
             {
-                return BadRequest("Category data is invalid.");
+                if (category == null)
+                {
+                    return BadRequest("Category data is invalid.");
+                }
+                _context.Categories.Add(category);
+                _context.SaveChanges();
+                return CreatedAtRoute("GetCategoryById", new { id = category.CategoryId }, category);
             }
-            _context.Categories.Add(category);
-            _context.SaveChanges();
-            return CreatedAtRoute("GetCategoryById", new { id = category.CategoryId }, category);
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpPut("{id:int}")]
         public ActionResult<Category> UpdateCategory(int id, [FromBody] Category category)
         {
-            if (category == null)
+            try
             {
-                return BadRequest("Category data is invalid.");
+                if (category == null)
+                {
+                    return BadRequest("Category data is invalid.");
+                }
+
+                category.CategoryId = id;
+
+                var existingCategory = _context.Categories
+                    .FirstOrDefault(c => c.CategoryId == id && c.DeletionDate == null);
+                if (existingCategory == null)
+                {
+                    return NotFound("Category not found...");
+                }
+
+                existingCategory.CategoryName = category.CategoryName ?? existingCategory.CategoryName;
+                existingCategory.Description = category.Description ?? existingCategory.Description;
+                existingCategory.ImageUrl = category.ImageUrl ?? existingCategory.ImageUrl;
+                existingCategory.UpdateDate = DateTime.UtcNow;
+
+                _context.Categories.Update(existingCategory);
+                _context.SaveChanges();
+
+                return Ok(existingCategory);
             }
-
-            category.CategoryId = id;
-
-            var existingCategory = _context.Categories
-                .FirstOrDefault(c => c.CategoryId == id && c.DeletionDate == null);
-            if (existingCategory == null)
+            catch (Exception)
             {
-                return NotFound("Category not found...");
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
-
-            existingCategory.CategoryName = category.CategoryName ?? existingCategory.CategoryName;
-            existingCategory.Description = category.Description ?? existingCategory.Description;
-            existingCategory.ImageUrl = category.ImageUrl ?? existingCategory.ImageUrl;
-            existingCategory.UpdateDate = DateTime.UtcNow;
-
-            _context.Categories.Update(existingCategory);
-            _context.SaveChanges();
-
-            return Ok(existingCategory);
         }
 
         [HttpDelete("{id:int}")]
-        public ActionResult DeleteCategory(int id) 
+        public ActionResult DeleteCategory(int id)
         {
-            var existingCategory = _context.Categories
+            try
+            {
+                var existingCategory = _context.Categories
                 .FirstOrDefault(c => c.CategoryId == id && c.DeletionDate == null);
 
-            if (existingCategory == null)
-            {
-                return NotFound("Category not found...");
+                if (existingCategory == null)
+                {
+                    return NotFound("Category not found...");
+                }
+
+                existingCategory.DeletionDate = DateTime.UtcNow;
+                existingCategory.UpdateDate = DateTime.UtcNow;
+
+                _context.Categories.Update(existingCategory);
+                _context.SaveChanges();
+
+                return Ok($"Category {existingCategory.CategoryName} deleted successfully.");
             }
+            catch (Exception)
+            {
 
-            existingCategory.DeletionDate = DateTime.UtcNow;
-            existingCategory.UpdateDate = DateTime.UtcNow;
-
-            _context.Categories.Update(existingCategory);
-            _context.SaveChanges();
-
-            return Ok($"Category {existingCategory.CategoryName} deleted successfully.");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }

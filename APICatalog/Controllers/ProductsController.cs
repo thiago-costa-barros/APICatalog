@@ -19,91 +19,131 @@ namespace APICatalog.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Product>> GetAllProducts()
         {
-            var products = _context.Products
-                .Where(p => p.DeletionDate == null)
-                .AsNoTracking()
-                .ToList();
+            try
+            {
+                var products = _context.Products
+                    .Where(p => p.DeletionDate == null)
+                    .AsNoTracking()
+                    .ToList();
 
-            if (products.Count() < 1)
+                if (products.Count() < 1)
                 {
-                return NotFound("Product not found...");
+                    return NotFound("Product not found...");
                 }
-            return products;
+                return products;
+            }
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpGet("{id:int}", Name = "GetProductById")]
         public ActionResult<Product> GetProductById(int id)
         {
-            var product = _context.Products
-                .FirstOrDefault(p => p.ProductId == id && p.DeletionDate == null);
-            if (product == null)
+            try
             {
-                return NotFound("Product not found...");
+                var product = _context.Products
+                .FirstOrDefault(p => p.ProductId == id && p.DeletionDate == null);
+                if (product == null)
+                {
+                    return NotFound("Product not found...");
+                }
+                return product;
             }
-            return product;
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpPost]
         public ActionResult<Product> InsertProduct([FromBody] Product product)
         {
-            if (product == null)
+            try
             {
-                return BadRequest("Invalided Product...");
+                if (product == null)
+                {
+                    return BadRequest("Invalided Product...");
+                }
+                _context.Products.Add(product);
+                _context.SaveChanges();
+                return CreatedAtRoute("GetProductById", new { id = product.ProductId }, product);
             }
-            _context.Products.Add(product);
-            _context.SaveChanges();
-            return CreatedAtRoute("GetProductById", new { id = product.ProductId }, product);
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpPut("{id:int}")]
         public ActionResult<Product> UpdateProduct(int id, [FromBody] Product product)
         {
-            if (product == null)
+            try
             {
-                return BadRequest("Product data is invalid.");
+                if (product == null)
+                {
+                    return BadRequest("Product data is invalid.");
+                }
+
+                product.ProductId = id;
+
+                var existingProduct = _context.Products
+                    .FirstOrDefault(p => p.ProductId == id && p.DeletionDate == null);
+
+                if (existingProduct == null)
+                {
+                    return NotFound("Product not found...");
+                }
+
+                existingProduct.ProductName = product.ProductName ?? existingProduct.ProductName;
+                existingProduct.Description = product.Description ?? existingProduct.Description;
+                existingProduct.ImageUrl = product.ImageUrl ?? existingProduct.ImageUrl;
+                existingProduct.Price = product.Price != 0 ? product.Price : existingProduct.Price;
+                existingProduct.CategoryId = product.CategoryId ?? existingProduct.CategoryId;
+                existingProduct.UpdateDate = DateTime.UtcNow;
+
+                _context.Products.Update(existingProduct);
+                _context.SaveChanges();
+
+                return Ok(existingProduct);
             }
-
-            product.ProductId = id;
-
-            var existingProduct = _context.Products
-                .FirstOrDefault(p => p.ProductId == id && p.DeletionDate == null);
-
-            if (existingProduct == null)
+            catch (Exception)
             {
-                return NotFound("Product not found...");
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
-
-            existingProduct.ProductName = product.ProductName ?? existingProduct.ProductName;
-            existingProduct.Description = product.Description ?? existingProduct.Description;
-            existingProduct.ImageUrl = product.ImageUrl ?? existingProduct.ImageUrl;
-            existingProduct.Price = product.Price != 0 ? product.Price : existingProduct.Price;
-            existingProduct.CategoryId = product.CategoryId ?? existingProduct.CategoryId;
-            existingProduct.UpdateDate = DateTime.UtcNow;
-
-            _context.Products.Update(existingProduct);
-            _context.SaveChanges();
-
-            return Ok(existingProduct);
         }
 
         [HttpDelete("{id:int}")]
         public ActionResult RemoveProduct(int id)
         {
-            var existingProduct = _context.Products
-                .FirstOrDefault(p => p.ProductId == id && p.DeletionDate == null);
-
-            if (existingProduct == null)
+            try
             {
-                return NotFound("Product not found...");
+                var existingProduct = _context.Products
+                    .FirstOrDefault(p => p.ProductId == id && p.DeletionDate == null);
+
+                if (existingProduct == null)
+                {
+                    return NotFound("Product not found...");
+                }
+
+                existingProduct.DeletionDate = DateTime.UtcNow;
+                existingProduct.UpdateDate = DateTime.UtcNow;
+
+                _context.Products.Update(existingProduct);
+                _context.SaveChanges();
+
+                return Ok($"Product '{existingProduct.ProductName}' was deleted successfully...");
             }
+            catch (Exception)
+            {
 
-            existingProduct.DeletionDate = DateTime.UtcNow;
-            existingProduct.UpdateDate = DateTime.UtcNow;
-
-            _context.Products.Update(existingProduct);
-            _context.SaveChanges();
-
-            return Ok($"Product '{existingProduct.ProductName}' was deleted successfully...");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }
