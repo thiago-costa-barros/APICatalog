@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using APICatalog.Models.Base;
 
 namespace APICatalog.Models;
@@ -31,5 +32,6 @@ public class Product: BaseEntity
  
     [ForeignKey("Category")]
     public int? CategoryId { get; set; }
+    [JsonIgnore]
     public Category? Category { get; set; }
 }
