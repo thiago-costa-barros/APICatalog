@@ -21,6 +21,7 @@ namespace APICatalog.Controllers
         {
             var categories = _context.Categories
                 .Where(c => c.DeletionDate == null)
+                .AsNoTracking()
                 .ToList();
             if (categories.Count() < 1)
             {
@@ -35,6 +36,7 @@ namespace APICatalog.Controllers
             var categories = _context.Categories
                 .Include(c => c.Products.Where(p => p.DeletionDate == null))
                 .Where(c => c.DeletionDate == null)
+                .AsNoTracking()
                 .ToList();
             if (categories.Count() < 1)
             {

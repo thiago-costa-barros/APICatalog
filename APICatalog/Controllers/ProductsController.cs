@@ -21,6 +21,7 @@ namespace APICatalog.Controllers
         {
             var products = _context.Products
                 .Where(p => p.DeletionDate == null)
+                .AsNoTracking()
                 .ToList();
 
             if (products.Count() < 1)
