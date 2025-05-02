@@ -17,16 +17,16 @@ namespace APICatalog.Controllers
         }
 
         [HttpGet]
-        public ActionResult<Product> GetAllProducts()
+        public async Task<ActionResult<Product>> GetAllProducts()
         {
             try
             {
-                var products = _context.Products
+                var products = await _context.Products
                     .Where(p => p.DeletionDate == null)
                     .AsNoTracking()
-                    .ToList();
+                    .ToListAsync();
 
-                if (products.Count() < 1)
+                if (!products.Any())
                 {
                     return NotFound("Product not found...");
                 }
@@ -34,18 +34,17 @@ namespace APICatalog.Controllers
             }
             catch (Exception)
             {
-
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("{id:int}", Name = "GetProductById")]
-        public ActionResult<Product> GetProductById(int id)
+        public async Task<ActionResult<Product>> GetProductById(int id)
         {
             try
             {
-                var product = _context.Products
-                .FirstOrDefault(p => p.ProductId == id && p.DeletionDate == null);
+                var product = await _context.Products
+                .FirstOrDefaultAsync(p => p.ProductId == id && p.DeletionDate == null);
                 if (product == null)
                 {
                     return NotFound("Product not found...");
