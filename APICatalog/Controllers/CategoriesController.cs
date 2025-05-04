@@ -17,15 +17,15 @@ namespace APICatalog.Controllers
         }
 
         [HttpGet]
-        public ActionResult<Category> GetAllCategories()
+        public async Task<ActionResult<Category>> GetAllCategories()
         {
             try
             {
-                var categories = _context.Categories
+                var categories = await _context.Categories
                 .Where(c => c.DeletionDate == null)
                 .AsNoTracking()
-                .ToList();
-                if (categories.Count() < 1)
+                .ToListAsync();
+                if (!categories.Any())
                 {
                     return NotFound("Category not found...");
                 }
@@ -40,15 +40,15 @@ namespace APICatalog.Controllers
         }
 
         [HttpGet("products")]
-        public ActionResult<Category> GetAllCategoriesWithProducts()
+        public async Task<ActionResult<Category>> GetAllCategoriesWithProducts()
         {
             try
             {
-                var categories = _context.Categories
+                var categories = await _context.Categories
                 .Include(c => c.Products.Where(p => p.DeletionDate == null))
                 .Where(c => c.DeletionDate == null)
                 .AsNoTracking()
-                .ToList();
+                .ToListAsync();
                 if (categories.Count() < 1)
                 {
                     return NotFound("Category not found...");
@@ -63,12 +63,12 @@ namespace APICatalog.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetCategoryById")]
-        public ActionResult<Category> GetCategoryById(int id)
+        public async Task<ActionResult<Category>> GetCategoryById(int id)
         {
             try
             {
-                var category = _context.Categories
-                .FirstOrDefault(c => c.CategoryId == id && c.DeletionDate == null);
+                var category = await _context.Categories
+                .FirstOrDefaultAsync(c => c.CategoryId == id && c.DeletionDate == null);
                 if (category == null)
                 {
                     return NotFound("Category not found...");
