@@ -1,9 +1,9 @@
-﻿using APICatalog.Entities.Models;
-using APICatalog.Repositories;
+﻿using APICatalog.APICatalog.Core.Entities.Models;
+using APICatalog.APICatalog.Data.Repositories.Categories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace APICatalog.Controllers
+namespace APICatalog.APICatalog.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

@@ -1,6 +1,6 @@
-﻿using APICatalog.Entities.Models.Base;
+﻿using APICatalog.APICatalog.Core.Entities.Models.Base;
 
-namespace APICatalog.Entities.Models;
+namespace APICatalog.APICatalog.Core.Entities.Models;
 
 public class User: BaseEntity
 {

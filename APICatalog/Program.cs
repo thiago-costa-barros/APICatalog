@@ -1,5 +1,5 @@
-using APICatalog.Context;
-using APICatalog.Repositories;
+using APICatalog.APICatalog.Data.Repositories.Categories;
+using APICatalog.APICataolog.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 

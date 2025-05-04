@@ -1,8 +1,8 @@
-﻿using APICatalog.Context;
-using APICatalog.Entities.Models;
+﻿using APICatalog.APICatalog.Core.Entities.Models;
+using APICatalog.APICataolog.Data.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace APICatalog.Repositories
+namespace APICatalog.APICatalog.Data.Repositories.Categories
 {
     public class CategoryProcedures
     {
