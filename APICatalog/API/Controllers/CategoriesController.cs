@@ -90,7 +90,7 @@ namespace APICatalog.APICatalog.API.Controllers
                 {
                     return BadRequest("Category could not be created.");
                 }
-                return CreatedAtRoute("GetCategoryById", new { id = category.CategoryId }, category);
+                return CreatedAtRoute("GetCategoryById", new { id = newCategory.CategoryId }, newCategory);
             }
             catch (Exception)
             {
@@ -109,9 +109,9 @@ namespace APICatalog.APICatalog.API.Controllers
                     return BadRequest("Category data is invalid.");
                 }
 
-                var updateCategory = await _repository.UpdateCategoryAsync(id, category);
+                var updatedCategory = await _repository.UpdateCategoryAsync(id, category);
 
-                return Ok(updateCategory);
+                return Ok(updatedCategory);
             }
             catch (Exception)
             {

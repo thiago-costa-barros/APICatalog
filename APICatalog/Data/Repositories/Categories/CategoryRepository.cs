@@ -19,9 +19,10 @@ namespace APICatalog.APICatalog.Data.Repositories.Categories
             return await _categoryProcedures.GetAllCategoriesWithProductsAsync();
         }
 
-        public async Task<Category?> GetCategoryByIdAsync(int id)
+        public async Task<Category> GetCategoryByIdAsync(int id)
         {
-            return await _categoryProcedures.GetCategoryByIdAsync(id);
+            var category = await _categoryProcedures.GetCategoryByIdAsync(id);
+            return category ?? throw new InvalidOperationException($"Category not found.");
         }
 
         public async Task<Category> InsertCategoryAsync(Category category)
@@ -30,9 +31,10 @@ namespace APICatalog.APICatalog.Data.Repositories.Categories
         }
 
 
-        public async Task<Category?> UpdateCategoryAsync(int id, Category category)
+        public async Task<Category> UpdateCategoryAsync(int id, Category category)
         {
-            return await _categoryProcedures.UpdateCategoryAsync(id, category);
+            var updatedCategory = await _categoryProcedures.UpdateCategoryAsync(id, category);
+            return updatedCategory ?? throw new InvalidOperationException($"Category not found.");
         }
         public async Task<bool> RemoveCategoryAsync(int id)
         {

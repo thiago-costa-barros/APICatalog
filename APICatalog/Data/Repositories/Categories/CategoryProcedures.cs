@@ -70,13 +70,15 @@ namespace APICatalog.APICatalog.Data.Repositories.Categories
 
         public async Task<bool> RemoveCategoryAsync(int id)
         {
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(c => c.CategoryId == id && c.DeletionDate == null);
+            var category = await GetCategoryByIdAsync(id);
+
             if (category == null)
             {
                 return false;
             }
+
             category.DeletionDate = DateTime.UtcNow;
+
             _context.Categories.Update(category);
             await _context.SaveChangesAsync();
             return true;
