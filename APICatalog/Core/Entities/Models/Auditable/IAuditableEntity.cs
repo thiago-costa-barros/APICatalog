@@ -1,6 +1,6 @@
 ﻿namespace APICatalog.APICatalog.Core.Entities.Models.Base
 {
-    public interface IBaseEntity
+    public interface IAuditableEntity
     {
         DateTime CreationDate { get; set; }
         DateTime UpdateDate { get; set; }

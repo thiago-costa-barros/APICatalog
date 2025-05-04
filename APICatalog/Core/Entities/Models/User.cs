@@ -2,7 +2,7 @@
 
 namespace APICatalog.APICatalog.Core.Entities.Models;
 
-public class User: BaseEntity
+public class User: AuditableEntity
 {
     public int UserId { get; set; }
     public string? UserName { get; set; }

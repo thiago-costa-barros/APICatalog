@@ -5,7 +5,7 @@ using APICatalog.APICatalog.Core.Entities.Models.Base;
 
 namespace APICatalog.APICatalog.Core.Entities.Models;
 
-public class Category: BaseEntity
+public class Category: AuditableEntity
 {
     public Category()
     {

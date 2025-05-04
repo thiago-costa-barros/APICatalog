@@ -5,7 +5,7 @@ using APICatalog.APICatalog.Core.Entities.Models.Base;
 
 namespace APICatalog.APICatalog.Core.Entities.Models;
 
-public class Product: BaseEntity
+public class Product: AuditableEntity
 {
     public int ProductId { get; set; }
 

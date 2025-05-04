@@ -2,7 +2,7 @@
 
 namespace APICatalog.APICatalog.Core.Entities.Models.Base
 {
-    public class BaseEntity : IBaseEntity
+    public class AuditableEntity : IAuditableEntity
     {
         [JsonIgnore]
         public DateTime CreationDate { get; set; } = DateTime.UtcNow;
