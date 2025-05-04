@@ -1,7 +1,9 @@
 ﻿using APICatalog.APICatalog.Core.Entities.Models;
 using APICatalog.APICataolog.Data.Context;
+using APICatalog.Data.Repositories.Products;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace APICatalog.APICatalog.API.Controllers
 {
@@ -9,26 +11,23 @@ namespace APICatalog.APICatalog.API.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IProductRepository _repository;
 
-        public ProductsController(AppDbContext context)
+        public ProductsController(IProductRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         [HttpGet]
-        public ActionResult<Product> GetAllProducts()
+        public async Task<ActionResult<Product>> GetAllProducts()
         {
             try
             {
-                var products = _context.Products
-                    .Where(p => p.DeletionDate == null)
-                    .AsNoTracking()
-                    .ToList();
+                var products = await _repository.GetAllProductsAsync();
 
-                if (products.Count() < 1)
+                if (products.Count()< 1)
                 {
-                    return NotFound("Product not found...");
+                    return NotFound("Products not found...");
                 }
                 return Ok(products);
             }
@@ -40,16 +39,12 @@ namespace APICatalog.APICatalog.API.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetProductById")]
-        public ActionResult<Product> GetProductById(int id)
+        public async Task<ActionResult<Product>> GetProductById(int id)
         {
             try
             {
-                var product = _context.Products
-                .FirstOrDefault(p => p.ProductId == id && p.DeletionDate == null);
-                if (product == null)
-                {
-                    return NotFound("Product not found...");
-                }
+                var product = await _repository.GetProductByIdAsync(id);
+
                 return Ok(product);
             }
             catch (Exception)
@@ -60,7 +55,7 @@ namespace APICatalog.APICatalog.API.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Product> InsertProduct([FromBody] Product product)
+        public async Task<ActionResult<Product>> InsertProduct([FromBody] Product product)
         {
             try
             {
@@ -68,9 +63,15 @@ namespace APICatalog.APICatalog.API.Controllers
                 {
                     return BadRequest("Invalided Product...");
                 }
-                _context.Products.Add(product);
-                _context.SaveChanges();
-                return CreatedAtRoute("GetProductById", new { id = product.ProductId }, product);
+
+                var insertProduct = await _repository.InsertProductAsync(product);
+
+                if(insertProduct == null) 
+                {
+                    return BadRequest("Product could not be created.");
+                }
+
+                return CreatedAtRoute("GetProductById", new { id = insertProduct.ProductId }, insertProduct);
             }
             catch (Exception)
             {
@@ -80,7 +81,7 @@ namespace APICatalog.APICatalog.API.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public ActionResult<Product> UpdateProduct(int id, [FromBody] Product product)
+        public async Task<ActionResult<Product>> UpdateProduct(int id, [FromBody] Product product)
         {
             try
             {
@@ -89,27 +90,9 @@ namespace APICatalog.APICatalog.API.Controllers
                     return BadRequest("Product data is invalid.");
                 }
 
-                product.ProductId = id;
+                var updatedProduct = await _repository.UpdateProductAsync(id, product);
 
-                var existingProduct = _context.Products
-                    .FirstOrDefault(p => p.ProductId == id && p.DeletionDate == null);
-
-                if (existingProduct == null)
-                {
-                    return NotFound("Product not found...");
-                }
-
-                existingProduct.ProductName = product.ProductName ?? existingProduct.ProductName;
-                existingProduct.Description = product.Description ?? existingProduct.Description;
-                existingProduct.ImageUrl = product.ImageUrl ?? existingProduct.ImageUrl;
-                existingProduct.Price = product.Price != 0 ? product.Price : existingProduct.Price;
-                existingProduct.CategoryId = product.CategoryId ?? existingProduct.CategoryId;
-                existingProduct.UpdateDate = DateTime.UtcNow;
-
-                _context.Products.Update(existingProduct);
-                _context.SaveChanges();
-
-                return Ok(existingProduct);
+                return Ok(updatedProduct);
             }
             catch (Exception)
             {
@@ -119,25 +102,13 @@ namespace APICatalog.APICatalog.API.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        public ActionResult RemoveProduct(int id)
+        public async Task<ActionResult> RemoveProduct(int id)
         {
             try
             {
-                var existingProduct = _context.Products
-                    .FirstOrDefault(p => p.ProductId == id && p.DeletionDate == null);
+                var removedProduct = await _repository.RemoveProductAsync(id);
 
-                if (existingProduct == null)
-                {
-                    return NotFound("Product not found...");
-                }
-
-                existingProduct.DeletionDate = DateTime.UtcNow;
-                existingProduct.UpdateDate = DateTime.UtcNow;
-
-                _context.Products.Update(existingProduct);
-                _context.SaveChanges();
-
-                return Ok($"Product '{existingProduct.ProductName}' was deleted successfully...");
+                return NoContent();
             }
             catch (Exception)
             {

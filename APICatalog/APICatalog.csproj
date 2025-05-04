@@ -23,7 +23,6 @@
     <Folder Include="API\DTOs\Products\" />
     <Folder Include="API\Middlewares\" />
     <Folder Include="Core\Services\" />
-    <Folder Include="Data\Repositories\Products\" />
   </ItemGroup>
 
 </Project>
