@@ -1,4 +1,4 @@
-﻿namespace APICatalog.Models.Base
+﻿namespace APICatalog.Entities.Models.Base
 {
     public interface IBaseEntity
     {

@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using APICatalog.Models.Base;
+using APICatalog.Entities.Models.Base;
 
-namespace APICatalog.Models;
+namespace APICatalog.Entities.Models;
 
 public class Product: BaseEntity
 {

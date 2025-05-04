@@ -1,5 +1,5 @@
-﻿using APICatalog.Context;
-using APICatalog.Models;
+﻿using APICatalog.Entities.Models;
+using APICatalog.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,23 +9,20 @@ namespace APICatalog.Controllers
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ICategoryRepository _repository;
 
-        public CategoriesController(AppDbContext context)
+        public CategoriesController(ICategoryRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         [HttpGet]
-        public ActionResult<Category> GetAllCategories()
+        public async Task<ActionResult<IEnumerable<Category>>> GetAllCategories()
         {
             try
             {
-                var categories = _context.Categories
-                .Where(c => c.DeletionDate == null)
-                .AsNoTracking()
-                .ToList();
-                if (categories.Count() < 1)
+                var categories = await _repository.GetAllCategoriesAsync();
+                if (categories is null)
                 {
                     return NotFound("Category not found...");
                 }
@@ -40,15 +37,11 @@ namespace APICatalog.Controllers
         }
 
         [HttpGet("products")]
-        public ActionResult<Category> GetAllCategoriesWithProducts()
+        public async Task<ActionResult<Category>> GetAllCategoriesWithProducts()
         {
             try
             {
-                var categories = _context.Categories
-                .Include(c => c.Products.Where(p => p.DeletionDate == null))
-                .Where(c => c.DeletionDate == null)
-                .AsNoTracking()
-                .ToList();
+                var categories = await _repository.GetAllCategoriesWithProductsAsync();
                 if (categories.Count() < 1)
                 {
                     return NotFound("Category not found...");
@@ -63,12 +56,11 @@ namespace APICatalog.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetCategoryById")]
-        public ActionResult<Category> GetCategoryById(int id)
+        public async Task<ActionResult<Category>> GetCategoryById(int id)
         {
             try
             {
-                var category = _context.Categories
-                .FirstOrDefault(c => c.CategoryId == id && c.DeletionDate == null);
+                var category = await _repository.GetCategoryByIdAsync(id);
                 if (category == null)
                 {
                     return NotFound("Category not found...");
@@ -83,7 +75,7 @@ namespace APICatalog.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Category> InsertCategory([FromBody] Category category)
+        public async Task<ActionResult<Category>> InsertCategory([FromBody] Category category)
         {
             try
             {
@@ -91,8 +83,13 @@ namespace APICatalog.Controllers
                 {
                     return BadRequest("Category data is invalid.");
                 }
-                _context.Categories.Add(category);
-                _context.SaveChanges();
+
+                var newCategory = await _repository.InsertCategoryAsync(category);
+
+                if (newCategory == null)
+                {
+                    return BadRequest("Category could not be created.");
+                }
                 return CreatedAtRoute("GetCategoryById", new { id = category.CategoryId }, category);
             }
             catch (Exception)
@@ -103,7 +100,7 @@ namespace APICatalog.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public ActionResult<Category> UpdateCategory(int id, [FromBody] Category category)
+        public async Task<ActionResult<Category>> UpdateCategory(int id, [FromBody] Category category)
         {
             try
             {
@@ -112,24 +109,9 @@ namespace APICatalog.Controllers
                     return BadRequest("Category data is invalid.");
                 }
 
-                category.CategoryId = id;
+                var updateCategory = await _repository.UpdateCategoryAsync(id, category);
 
-                var existingCategory = _context.Categories
-                    .FirstOrDefault(c => c.CategoryId == id && c.DeletionDate == null);
-                if (existingCategory == null)
-                {
-                    return NotFound("Category not found...");
-                }
-
-                existingCategory.CategoryName = category.CategoryName ?? existingCategory.CategoryName;
-                existingCategory.Description = category.Description ?? existingCategory.Description;
-                existingCategory.ImageUrl = category.ImageUrl ?? existingCategory.ImageUrl;
-                existingCategory.UpdateDate = DateTime.UtcNow;
-
-                _context.Categories.Update(existingCategory);
-                _context.SaveChanges();
-
-                return Ok(existingCategory);
+                return Ok(updateCategory);
             }
             catch (Exception)
             {
@@ -139,25 +121,13 @@ namespace APICatalog.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        public ActionResult DeleteCategory(int id)
+        public async Task<ActionResult> RemoveCategory(int id)
         {
             try
             {
-                var existingCategory = _context.Categories
-                .FirstOrDefault(c => c.CategoryId == id && c.DeletionDate == null);
+                var removedCategory = await _repository.RemoveCategoryAsync(id);
 
-                if (existingCategory == null)
-                {
-                    return NotFound("Category not found...");
-                }
-
-                existingCategory.DeletionDate = DateTime.UtcNow;
-                existingCategory.UpdateDate = DateTime.UtcNow;
-
-                _context.Categories.Update(existingCategory);
-                _context.SaveChanges();
-
-                return Ok($"Category {existingCategory.CategoryName} deleted successfully.");
+                return NoContent();
             }
             catch (Exception)
             {

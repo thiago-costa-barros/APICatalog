@@ -1,0 +1,42 @@
+﻿using APICatalog.Entities.Models;
+
+namespace APICatalog.Repositories
+{
+    public class CategoryRepository : ICategoryRepository
+    {
+        private readonly CategoryProcedures _categoryProcedures;
+        public CategoryRepository(CategoryProcedures categoryProcedures)
+        {
+            _categoryProcedures = categoryProcedures;
+        }
+        public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
+        {
+            return await _categoryProcedures.GetAllCategoriesAsync();
+        }
+
+        public async Task<IEnumerable<Category>> GetAllCategoriesWithProductsAsync()
+        {
+            return await _categoryProcedures.GetAllCategoriesWithProductsAsync();
+        }
+
+        public async Task<Category?> GetCategoryByIdAsync(int id)
+        {
+            return await _categoryProcedures.GetCategoryByIdAsync(id);
+        }
+
+        public async Task<Category> InsertCategoryAsync(Category category)
+        {
+            return await _categoryProcedures.InsertCategoryAsync(category);
+        }
+
+
+        public async Task<Category?> UpdateCategoryAsync(int id, Category category)
+        {
+            return await _categoryProcedures.UpdateCategoryAsync(id, category);
+        }
+        public async Task<bool> RemoveCategoryAsync(int id)
+        {
+            return await _categoryProcedures.RemoveCategoryAsync(id);
+        }
+    }
+}

@@ -1,5 +1,5 @@
 ﻿using APICatalog.Context;
-using APICatalog.Models;
+using APICatalog.Entities.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

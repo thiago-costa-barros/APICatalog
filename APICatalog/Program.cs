@@ -1,4 +1,5 @@
 using APICatalog.Context;
+using APICatalog.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -19,6 +20,9 @@ builder.Services.AddSwaggerGen();
 var stringPostgres = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(stringPostgres));
+
+builder.Services.AddScoped<CategoryProcedures>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 var app = builder.Build();
 
