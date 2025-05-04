@@ -1,3 +1,4 @@
+using APICatalog.API.Filters;
 using APICatalog.APICatalog.Data.Repositories.Categories;
 using APICatalog.APICataolog.Data.Context;
 using APICatalog.Data.Repositories.Products;
@@ -8,7 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers().AddJsonOptions(options =>
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add(typeof(ApiExceptionFilter));
+}).AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.Configure<RouteOptions>(options =>

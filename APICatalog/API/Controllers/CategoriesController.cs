@@ -19,121 +19,72 @@ namespace APICatalog.APICatalog.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Category>>> GetAllCategories()
         {
-            try
+            var categories = await _repository.GetAllCategoriesAsync();
+            if (categories is null)
             {
-                var categories = await _repository.GetAllCategoriesAsync();
-                if (categories is null)
-                {
-                    return NotFound("Category not found...");
-                }
-                return Ok(categories);
+                return NotFound("Categories not found...");
             }
-            catch (Exception)
-            {
-
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-
+            return Ok(categories);
         }
 
         [HttpGet("products")]
         public async Task<ActionResult<Category>> GetAllCategoriesWithProducts()
         {
-            try
+            var categories = await _repository.GetAllCategoriesWithProductsAsync();
+            if (categories.Count() < 1)
             {
-                var categories = await _repository.GetAllCategoriesWithProductsAsync();
-                if (categories.Count() < 1)
-                {
-                    return NotFound("Category not found...");
-                }
-                return Ok(categories);
+                return NotFound("Category not found...");
             }
-            catch (Exception)
-            {
-
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            return Ok(categories);
         }
 
         [HttpGet("{id:int}", Name = "GetCategoryById")]
         public async Task<ActionResult<Category>> GetCategoryById(int id)
         {
-            try
+            var category = await _repository.GetCategoryByIdAsync(id);
+            if (category == null)
             {
-                var category = await _repository.GetCategoryByIdAsync(id);
-                if (category == null)
-                {
-                    return NotFound("Category not found...");
-                }
-                return Ok(category);
+                return NotFound("Category not found...");
             }
-            catch (Exception)
-            {
-
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            return Ok(category);
         }
 
         [HttpPost]
         public async Task<ActionResult<Category>> InsertCategory([FromBody] Category category)
         {
-            try
+            if (category == null)
             {
-                if (category == null)
-                {
-                    return BadRequest("Category data is invalid.");
-                }
-
-                var newCategory = await _repository.InsertCategoryAsync(category);
-
-                if (newCategory == null)
-                {
-                    return BadRequest("Category could not be created.");
-                }
-                return CreatedAtRoute("GetCategoryById", new { id = newCategory.CategoryId }, newCategory);
+                return BadRequest("Category data is invalid.");
             }
-            catch (Exception)
+
+            var newCategory = await _repository.InsertCategoryAsync(category);
+
+            if (newCategory == null)
             {
-
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                return BadRequest("Category could not be created.");
             }
+            return CreatedAtRoute("GetCategoryById", new { id = newCategory.CategoryId }, newCategory);
         }
 
         [HttpPut("{id:int}")]
         public async Task<ActionResult<Category>> UpdateCategory(int id, [FromBody] Category category)
         {
-            try
+            if (category == null)
             {
-                if (category == null)
-                {
-                    return BadRequest("Category data is invalid.");
-                }
-
-                var updatedCategory = await _repository.UpdateCategoryAsync(id, category);
-
-                return Ok(updatedCategory);
+                return BadRequest("Category data is invalid.");
             }
-            catch (Exception)
-            {
 
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            var updatedCategory = await _repository.UpdateCategoryAsync(id, category);
+
+            return Ok(updatedCategory);
         }
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> RemoveCategory(int id)
         {
-            try
-            {
-                var removedCategory = await _repository.RemoveCategoryAsync(id);
+            var removedCategory = await _repository.RemoveCategoryAsync(id);
 
-                return NoContent();
-            }
-            catch (Exception)
-            {
-
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            return NoContent();
         }
     }
 }

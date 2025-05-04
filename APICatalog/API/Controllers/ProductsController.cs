@@ -21,100 +21,60 @@ namespace APICatalog.APICatalog.API.Controllers
         [HttpGet]
         public async Task<ActionResult<Product>> GetAllProducts()
         {
-            try
-            {
-                var products = await _repository.GetAllProductsAsync();
+            var products = await _repository.GetAllProductsAsync();
 
-                if (products.Count()< 1)
-                {
-                    return NotFound("Products not found...");
-                }
-                return Ok(products);
-            }
-            catch (Exception)
+            if (products.Count() < 1)
             {
-
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                return NotFound("Products not found...");
             }
+            return Ok(products);
         }
 
         [HttpGet("{id:int}", Name = "GetProductById")]
         public async Task<ActionResult<Product>> GetProductById(int id)
         {
-            try
-            {
-                var product = await _repository.GetProductByIdAsync(id);
+            var product = await _repository.GetProductByIdAsync(id);
 
-                return Ok(product);
-            }
-            catch (Exception)
-            {
-
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            return Ok(product);
         }
 
         [HttpPost]
         public async Task<ActionResult<Product>> InsertProduct([FromBody] Product product)
         {
-            try
+            if (product == null)
             {
-                if (product == null)
-                {
-                    return BadRequest("Invalided Product...");
-                }
-
-                var insertProduct = await _repository.InsertProductAsync(product);
-
-                if(insertProduct == null) 
-                {
-                    return BadRequest("Product could not be created.");
-                }
-
-                return CreatedAtRoute("GetProductById", new { id = insertProduct.ProductId }, insertProduct);
+                return BadRequest("Invalided Product...");
             }
-            catch (Exception)
+
+            var insertProduct = await _repository.InsertProductAsync(product);
+
+            if (insertProduct == null)
             {
-
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                return BadRequest("Product could not be created.");
             }
+
+            return CreatedAtRoute("GetProductById", new { id = insertProduct.ProductId }, insertProduct);
         }
 
         [HttpPut("{id:int}")]
         public async Task<ActionResult<Product>> UpdateProduct(int id, [FromBody] Product product)
         {
-            try
+            if (product == null)
             {
-                if (product == null)
-                {
-                    return BadRequest("Product data is invalid.");
-                }
-
-                var updatedProduct = await _repository.UpdateProductAsync(id, product);
-
-                return Ok(updatedProduct);
+                return BadRequest("Product data is invalid.");
             }
-            catch (Exception)
-            {
 
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            var updatedProduct = await _repository.UpdateProductAsync(id, product);
+
+            return Ok(updatedProduct);
         }
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> RemoveProduct(int id)
         {
-            try
-            {
-                var removedProduct = await _repository.RemoveProductAsync(id);
+            var removedProduct = await _repository.RemoveProductAsync(id);
 
-                return NoContent();
-            }
-            catch (Exception)
-            {
-
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            return NoContent();
         }
     }
 }
