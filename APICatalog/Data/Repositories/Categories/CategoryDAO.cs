@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace APICatalog.APICatalog.Data.Repositories.Categories
 {
-    public class CategoryProcedures
+    public class CategoryDAO
     {
         private readonly AppDbContext _context;
-        public CategoryProcedures(AppDbContext context)
+        public CategoryDAO(AppDbContext context)
         {
             _context = context;
         }

@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace APICatalog.Data.Repositories.Products
 {
-    public class ProductProcedures
+    public class ProductDAO
     {
         private readonly AppDbContext _context;
 
-        public ProductProcedures(AppDbContext context)
+        public ProductDAO(AppDbContext context)
         {
             _context = context;
         }
