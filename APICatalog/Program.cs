@@ -1,8 +1,10 @@
 using APICatalog.API.Filters;
-using APICatalog.APICatalog.Data.Repositories.Categories;
 using APICatalog.APICataolog.Data.Context;
+using APICatalog.Core.DI;
 using APICatalog.Data.Context;
-using APICatalog.Data.Repositories.Products;
+using APICatalog.Data.Repositories.DAOs;
+using APICatalog.Data.Repositories.Implementations;
+using APICatalog.Data.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -27,11 +29,7 @@ var stringPostgres = builder.Configuration.GetConnectionString("DefaultConnectio
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(stringPostgres));
 
-builder.Services.AddScoped<CategoryDAO>();
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<ProductDAO>();
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IDbTransaction, DbTransaction>();
+builder.Services.AddApplicationServices();
 
 var app = builder.Build();
 
