@@ -1,5 +1,6 @@
 ﻿using APICatalog.APICatalog.Core.Entities.Models;
 using APICatalog.APICataolog.Data.Context;
+using APICatalog.Data.Context;
 using APICatalog.Data.Repositories.Products;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,17 +12,17 @@ namespace APICatalog.APICatalog.API.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly IProductRepository _repository;
+        private readonly IDbTransaction _dbTransaction;
 
-        public ProductsController(IProductRepository repository)
+        public ProductsController(IDbTransaction dbTransaction)
         {
-            _repository = repository;
+            _dbTransaction = dbTransaction;
         }
 
         [HttpGet]
         public async Task<ActionResult<Product>> GetAllProducts()
         {
-            var products = await _repository.GetAllProductsAsync();
+            var products = await _dbTransaction.ProductRepository.GetAllProductsAsync();
 
             if (products.Count() < 1)
             {
@@ -33,7 +34,7 @@ namespace APICatalog.APICatalog.API.Controllers
         [HttpGet("{id:int}", Name = "GetProductById")]
         public async Task<ActionResult<Product>> GetProductById(int id)
         {
-            var product = await _repository.GetProductByIdAsync(id);
+            var product = await _dbTransaction.ProductRepository.GetProductByIdAsync(id);
 
             return Ok(product);
         }
@@ -46,7 +47,8 @@ namespace APICatalog.APICatalog.API.Controllers
                 return BadRequest("Invalided Product...");
             }
 
-            var insertProduct = await _repository.InsertProductAsync(product);
+            var insertProduct = await _dbTransaction.ProductRepository.InsertProductAsync(product);
+            _dbTransaction.Commit();
 
             if (insertProduct == null)
             {
@@ -64,7 +66,8 @@ namespace APICatalog.APICatalog.API.Controllers
                 return BadRequest("Product data is invalid.");
             }
 
-            var updatedProduct = await _repository.UpdateProductAsync(id, product);
+            var updatedProduct = await _dbTransaction.ProductRepository.UpdateProductAsync(id, product);
+            _dbTransaction.Commit();
 
             return Ok(updatedProduct);
         }
@@ -72,7 +75,8 @@ namespace APICatalog.APICatalog.API.Controllers
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> RemoveProduct(int id)
         {
-            var removedProduct = await _repository.RemoveProductAsync(id);
+            var removedProduct = await _dbTransaction.ProductRepository.RemoveProductAsync(id);
+            _dbTransaction.Commit();
 
             return NoContent();
         }

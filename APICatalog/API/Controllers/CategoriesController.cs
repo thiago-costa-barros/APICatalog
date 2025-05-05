@@ -1,5 +1,6 @@
 ﻿using APICatalog.APICatalog.Core.Entities.Models;
 using APICatalog.APICatalog.Data.Repositories.Categories;
+using APICatalog.Data.Context;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,17 +10,17 @@ namespace APICatalog.APICatalog.API.Controllers
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        private readonly ICategoryRepository _repository;
+        private readonly IDbTransaction _dbTransaction;
 
-        public CategoriesController(ICategoryRepository repository)
+        public CategoriesController(IDbTransaction dbTransaction)
         {
-            _repository = repository;
+            _dbTransaction = dbTransaction;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Category>>> GetAllCategories()
         {
-            var categories = await _repository.GetAllCategoriesAsync();
+            var categories = await _dbTransaction.CategoryRepository.GetAllCategoriesAsync();
             if (categories is null)
             {
                 return NotFound("Categories not found...");
@@ -30,7 +31,7 @@ namespace APICatalog.APICatalog.API.Controllers
         [HttpGet("products")]
         public async Task<ActionResult<Category>> GetAllCategoriesWithProducts()
         {
-            var categories = await _repository.GetAllCategoriesWithProductsAsync();
+            var categories = await _dbTransaction.CategoryRepository.GetAllCategoriesWithProductsAsync();
             if (categories.Count() < 1)
             {
                 return NotFound("Category not found...");
@@ -41,7 +42,7 @@ namespace APICatalog.APICatalog.API.Controllers
         [HttpGet("{id:int}", Name = "GetCategoryById")]
         public async Task<ActionResult<Category>> GetCategoryById(int id)
         {
-            var category = await _repository.GetCategoryByIdAsync(id);
+            var category = await _dbTransaction.CategoryRepository.GetCategoryByIdAsync(id);
             if (category == null)
             {
                 return NotFound("Category not found...");
@@ -57,7 +58,8 @@ namespace APICatalog.APICatalog.API.Controllers
                 return BadRequest("Category data is invalid.");
             }
 
-            var newCategory = await _repository.InsertCategoryAsync(category);
+            var newCategory = await _dbTransaction.CategoryRepository.InsertCategoryAsync(category);
+            _dbTransaction.Commit();
 
             if (newCategory == null)
             {
@@ -74,7 +76,8 @@ namespace APICatalog.APICatalog.API.Controllers
                 return BadRequest("Category data is invalid.");
             }
 
-            var updatedCategory = await _repository.UpdateCategoryAsync(id, category);
+            var updatedCategory = await _dbTransaction.CategoryRepository.UpdateCategoryAsync(id, category);
+            _dbTransaction.Commit();
 
             return Ok(updatedCategory);
         }
@@ -82,7 +85,8 @@ namespace APICatalog.APICatalog.API.Controllers
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> RemoveCategory(int id)
         {
-            var removedCategory = await _repository.RemoveCategoryAsync(id);
+            var removedCategory = await _dbTransaction.CategoryRepository.RemoveCategoryAsync(id);
+            _dbTransaction.Commit();
 
             return NoContent();
         }
