@@ -1,10 +1,6 @@
 ﻿using APICatalog.APICatalog.Core.Entities.Models;
-using APICatalog.APICataolog.Data.Context;
 using APICatalog.Data.Context;
-using APICatalog.Data.Repositories.Products;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace APICatalog.APICatalog.API.Controllers
 {

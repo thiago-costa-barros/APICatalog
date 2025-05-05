@@ -1,10 +1,6 @@
 using APICatalog.API.Filters;
 using APICatalog.APICataolog.Data.Context;
 using APICatalog.Core.DI;
-using APICatalog.Data.Context;
-using APICatalog.Data.Repositories.DAOs;
-using APICatalog.Data.Repositories.Implementations;
-using APICatalog.Data.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 

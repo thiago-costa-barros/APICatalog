@@ -1,5 +1,4 @@
-﻿using Scrutor;
-using APICatalog.APICataolog.Data.Context;
+﻿using APICatalog.APICataolog.Data.Context;
 using APICatalog.Data.Context;
 using APICatalog.Data.Repositories.DAOs;
 using APICatalog.Data.Repositories.Implementations;

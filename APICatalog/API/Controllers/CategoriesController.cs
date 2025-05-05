@@ -1,8 +1,6 @@
 ﻿using APICatalog.APICatalog.Core.Entities.Models;
-using APICatalog.APICatalog.Data.Repositories.Categories;
 using APICatalog.Data.Context;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace APICatalog.APICatalog.API.Controllers
 {
