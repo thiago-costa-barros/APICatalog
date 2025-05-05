@@ -1,5 +1,4 @@
-﻿using APICatalog.APICatalog.Data.Repositories.Categories;
-using APICatalog.Data.Repositories.Products;
+﻿using APICatalog.Data.Repositories.Interfaces;
 
 
 namespace APICatalog.Data.Context
