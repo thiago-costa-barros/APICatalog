@@ -35,7 +35,6 @@ namespace APICatalog.Data.Repositories.Products
         public async Task<Product> InsertProductAsync(Product product)
         {
             await _context.Products.AddAsync(product);
-            await _context.SaveChangesAsync();
             return product;
         }
 
@@ -58,7 +57,6 @@ namespace APICatalog.Data.Repositories.Products
             existingProduct.UpdateDate = DateTime.UtcNow;
 
             _context.Products.Update(existingProduct);
-            await _context.SaveChangesAsync();
             return existingProduct;
         }
 
@@ -74,7 +72,6 @@ namespace APICatalog.Data.Repositories.Products
             product.DeletionDate = DateTime.UtcNow;
 
             _context.Products.Update(product);
-            await _context.SaveChangesAsync();
             return true;
         }
     }

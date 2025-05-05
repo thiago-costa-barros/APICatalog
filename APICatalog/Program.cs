@@ -1,6 +1,7 @@
 using APICatalog.API.Filters;
 using APICatalog.APICatalog.Data.Repositories.Categories;
 using APICatalog.APICataolog.Data.Context;
+using APICatalog.Data.Context;
 using APICatalog.Data.Repositories.Products;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
@@ -30,6 +31,7 @@ builder.Services.AddScoped<CategoryProcedures>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ProductProcedures>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IDbTransaction, DbTransaction>();
 
 var app = builder.Build();
 

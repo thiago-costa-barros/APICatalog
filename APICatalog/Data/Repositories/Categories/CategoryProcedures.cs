@@ -43,7 +43,6 @@ namespace APICatalog.APICatalog.Data.Repositories.Categories
         public async Task<Category> InsertCategoryAsync(Category category)
         {
             await _context.Categories.AddAsync(category);
-            await _context.SaveChangesAsync();
             return category;
         }
 
@@ -64,7 +63,6 @@ namespace APICatalog.APICatalog.Data.Repositories.Categories
             existingCategory.UpdateDate = DateTime.UtcNow;
 
             _context.Categories.Update(existingCategory);
-            await _context.SaveChangesAsync();
             return existingCategory;
         }
 
@@ -80,7 +78,6 @@ namespace APICatalog.APICatalog.Data.Repositories.Categories
             category.DeletionDate = DateTime.UtcNow;
 
             _context.Categories.Update(category);
-            await _context.SaveChangesAsync();
             return true;
         }
     }
