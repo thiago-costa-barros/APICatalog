@@ -1,6 +1,8 @@
 ﻿using APICatalog.APICatalog.Core.Entities.Models;
+using APICatalog.Data.Repositories.DAOs;
+using APICatalog.Data.Repositories.Interfaces;
 
-namespace APICatalog.APICatalog.Data.Repositories.Categories
+namespace APICatalog.Data.Repositories.Implementations
 {
     public class CategoryRepository : ICategoryRepository
     {

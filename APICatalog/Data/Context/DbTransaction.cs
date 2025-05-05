@@ -1,6 +1,5 @@
-﻿using APICatalog.APICatalog.Data.Repositories.Categories;
-using APICatalog.APICataolog.Data.Context;
-using APICatalog.Data.Repositories.Products;
+﻿using APICatalog.APICataolog.Data.Context;
+using APICatalog.Data.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace APICatalog.Data.Context

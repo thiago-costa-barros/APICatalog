@@ -2,7 +2,7 @@
 using APICatalog.APICataolog.Data.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace APICatalog.APICatalog.Data.Repositories.Categories
+namespace APICatalog.Data.Repositories.DAOs
 {
     public class CategoryDAO
     {

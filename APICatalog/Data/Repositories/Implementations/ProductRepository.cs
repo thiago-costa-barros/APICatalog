@@ -1,6 +1,8 @@
 ﻿using APICatalog.APICatalog.Core.Entities.Models;
+using APICatalog.Data.Repositories.DAOs;
+using APICatalog.Data.Repositories.Interfaces;
 
-namespace APICatalog.Data.Repositories.Products
+namespace APICatalog.Data.Repositories.Implementations
 {
     public class ProductRepository : IProductRepository
     {

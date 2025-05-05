@@ -2,7 +2,7 @@
 using APICatalog.APICataolog.Data.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace APICatalog.Data.Repositories.Products
+namespace APICatalog.Data.Repositories.DAOs
 {
     public class ProductDAO
     {

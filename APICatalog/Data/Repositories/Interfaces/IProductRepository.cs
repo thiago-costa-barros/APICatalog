@@ -1,6 +1,6 @@
 ﻿using APICatalog.APICatalog.Core.Entities.Models;
 
-namespace APICatalog.Data.Repositories.Products
+namespace APICatalog.Data.Repositories.Interfaces
 {
     public interface IProductRepository
     {
