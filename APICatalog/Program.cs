@@ -25,7 +25,7 @@ var stringPostgres = builder.Configuration.GetConnectionString("DefaultConnectio
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(stringPostgres));
 
-builder.Services.AddApplicationServices();
+builder.Services.AddDependencyInjectionConfig();
 
 var app = builder.Build();
 
