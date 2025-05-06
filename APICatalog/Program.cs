@@ -1,6 +1,6 @@
-using APICatalog.Context;
-using APICatalog.Extensions;
-using APICatalogo.Filters;
+using APICatalog.API.Filters;
+using APICatalog.APICataolog.Data.Context;
+using APICatalog.Core.DI;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -8,7 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers().AddJsonOptions(options =>
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add(typeof(ApiExceptionFilter));
+}).AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.Configure<RouteOptions>(options =>
@@ -22,7 +25,7 @@ var stringPostgres = builder.Configuration.GetConnectionString("DefaultConnectio
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(stringPostgres));
 
-builder.Services.AddScoped<ApiLoggingFilter>();
+builder.Services.AddDependencyInjectionConfig();
 
 var app = builder.Build();
 
@@ -31,7 +34,6 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.ConfigureExceptionHandler();
 }
 
 app.UseHttpsRedirection();

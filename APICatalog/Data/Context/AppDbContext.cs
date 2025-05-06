@@ -1,7 +1,7 @@
-﻿using APICatalog.Models;
+﻿using APICatalog.APICatalog.Core.Entities.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace APICatalog.Context;
+namespace APICatalog.APICataolog.Data.Context;
 
 public class AppDbContext: DbContext
 {

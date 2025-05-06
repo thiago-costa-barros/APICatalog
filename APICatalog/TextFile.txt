@@ -1,2 +1,7 @@
 ﻿Run Database in docker
+
+Postgres
 docker run --restart=always --name postgres-apicatalog -e POSTGRES_PASSWORD=hash12345678@@ -p 5433:5432 -d postgres
+
+SQL Server
+docker run -e 'ACCEPT_EULA=Y' -e "MSSQL_SA_PASSWORD=Hash12345678@@" -p 1433:1433 --name sqlserver-apicatalog --hostname sqlserver-apicatalog --restart=always -d mcr.microsoft.com/mssql/server:2019-latest

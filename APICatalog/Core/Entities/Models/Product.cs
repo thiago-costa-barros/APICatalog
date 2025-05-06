@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using APICatalog.Models.Base;
+using APICatalog.APICatalog.Core.Entities.Models.Base;
 
-namespace APICatalog.Models;
+namespace APICatalog.APICatalog.Core.Entities.Models;
 
-public class Product: BaseEntity
+public class Product: AuditableEntity
 {
     public int ProductId { get; set; }
 
