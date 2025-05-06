@@ -2,7 +2,7 @@
 using APICatalog.Data.Repositories.DAOs;
 using APICatalog.Data.Repositories.Interfaces;
 
-namespace APICatalog.Data.Repositories.Implementations
+namespace APICatalog.Data.Repositories
 {
     public class CategoryRepository : ICategoryRepository
     {
