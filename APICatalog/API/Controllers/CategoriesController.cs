@@ -1,4 +1,6 @@
-﻿using APICatalog.APICatalog.Core.Entities.Models;
+﻿using APICatalog.API.DTOs;
+using APICatalog.API.DTOs.Mapping;
+using APICatalog.APICatalog.Core.Entities.Models;
 using APICatalog.Data.Context;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,14 +18,17 @@ namespace APICatalog.APICatalog.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetAllCategories()
+        public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetAllCategories()
         {
             var categories = await _dbTransaction.CategoryRepository.GetAllCategoriesAsync();
             if (categories is null)
             {
                 return NotFound("Categories not found...");
             }
-            return Ok(categories);
+
+            var categoriesDTO = categories.MapToCategoryDTOList();
+
+            return Ok(categoriesDTO);
         }
 
         [HttpGet("products")]
