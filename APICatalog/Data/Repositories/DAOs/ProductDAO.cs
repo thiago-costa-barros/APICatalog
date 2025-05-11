@@ -1,5 +1,6 @@
 ﻿using APICatalog.APICatalog.Core.Entities.Models;
 using APICatalog.APICataolog.Data.Context;
+using APICatalog.Core.Common.Pagination;
 using Microsoft.EntityFrameworkCore;
 
 namespace APICatalog.Data.Repositories.DAOs
@@ -19,6 +20,17 @@ namespace APICatalog.Data.Repositories.DAOs
                 .Where(p => p.DeletionDate == null)
                 .AsNoTracking()
                 .ToListAsync();
+        }
+
+        public async Task<PagedList<Product>> GetProductsPaged(PaginationParams paginationParams)
+        {
+            var products = _context.Products
+                .Where(p => p.DeletionDate == null)
+                .AsNoTracking()
+                .OrderBy(p => p.ProductId)
+                .AsQueryable();
+            var productsPaged = PagedList<Product>.ToPagedList(products, paginationParams.PageNumber, paginationParams.PageSize);
+            return await productsPaged;
         }
 
         public async Task<Product?> GetProductByIdAsync(int id)

@@ -1,5 +1,8 @@
 ﻿using APICatalog.API.DTOs;
+using APICatalog.API.DTOs.Common;
+using APICatalog.API.DTOs.Common.Mapping;
 using APICatalog.API.DTOs.Mapping;
+using APICatalog.Core.Common.Pagination;
 using APICatalog.Data.Context;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,9 +20,9 @@ namespace APICatalog.APICatalog.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllProducts()
+        public async Task<ActionResult<PagedResponseDTO<ProductDTO>>> GetProductsPaged([FromQuery] PaginationParams paginationParams)
         {
-            var products = await _dbTransaction.ProductRepository.GetAllProductsAsync();
+            var products = await _dbTransaction.ProductRepository.GetProductsPaged(paginationParams);
 
             if (products is null)
             {
@@ -27,8 +30,13 @@ namespace APICatalog.APICatalog.API.Controllers
             }
 
             var productsDTO = products.MapToProductDTOList();
-
-            return Ok(productsDTO);
+            var pagedProductsDTO = new PagedList<ProductDTO>(
+                productsDTO.ToList(),
+                products.TotalCount,
+                products.CurrentPage,
+                products.PageSize
+                ).MapToPagedResponseDTO();
+            return Ok(pagedProductsDTO);
         }
 
         [HttpGet("{id:int}", Name = "GetProductById")]
