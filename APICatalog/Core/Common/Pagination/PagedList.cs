@@ -19,15 +19,5 @@ namespace APICatalog.Core.Common.Pagination
             TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
             AddRange(items);
         }
-
-        public static async Task<PagedList<T>> ToPagedList(IQueryable<T> source, int currentPage, int pageSize)
-        {
-            var totalCount =  await source.CountAsync();
-            var items = await source
-                .Skip((currentPage - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-            return new PagedList<T>(items, totalCount, currentPage, pageSize);
-        }
     }
 }
