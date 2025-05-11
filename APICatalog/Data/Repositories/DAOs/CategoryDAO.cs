@@ -1,6 +1,7 @@
 ﻿using APICatalog.APICatalog.Core.Entities.Models;
 using APICatalog.APICataolog.Data.Context;
 using APICatalog.Core.Common.Pagination;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace APICatalog.Data.Repositories.DAOs
@@ -32,13 +33,30 @@ namespace APICatalog.Data.Repositories.DAOs
 
         public async Task<PagedList<Category>> GetCategoriesPaged(PaginationParams paginationParams)
         {
-            var categories = _context.Categories
-                .Where(c => c.DeletionDate == null)
+            var categories = await _context.Categories
+                .FromSqlRaw(
+                """
+                EXEC
+                    GetCategoriesPaged 
+                    @PageNumber, 
+                    @PageSize
+                """,
+                    new SqlParameter("@PageNumber", paginationParams.PageNumber),
+                    new SqlParameter("@PageSize", paginationParams.PageSize))
                 .AsNoTracking()
-                .OrderBy(c => c.CategoryId)
-                .AsQueryable();
-            var categoriesPaged = PagedList<Category>.ToPagedList(categories, paginationParams.PageNumber, paginationParams.PageSize);
-            return await categoriesPaged;
+                .ToListAsync();
+            var totalCount = await _context.Categories
+                .Where(c => c.DeletionDate == null)
+                .CountAsync();
+
+            var categoriesPaged = new PagedList<Category>(
+                categories,
+                totalCount,
+                paginationParams.PageNumber,
+                paginationParams.PageSize
+            );
+
+            return categoriesPaged;
         }
 
         public async Task<Category?> GetCategoryByIdAsync(int id)
