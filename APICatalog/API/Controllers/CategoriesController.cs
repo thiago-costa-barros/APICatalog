@@ -43,23 +43,28 @@ namespace APICatalog.APICatalog.API.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetCategoryById")]
-        public async Task<ActionResult<Category>> GetCategoryById(int id)
+        public async Task<ActionResult<CategoryDTO>> GetCategoryById(int id)
         {
             var category = await _dbTransaction.CategoryRepository.GetCategoryByIdAsync(id);
             if (category == null)
             {
                 return NotFound("Category not found...");
             }
-            return Ok(category);
+
+            var categoryDTO = category.MapToCategoryDTO();
+
+            return Ok(categoryDTO);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Category>> InsertCategory([FromBody] Category category)
+        public async Task<ActionResult<CategoryDTO>> InsertCategory([FromBody] CategoryDTO categoryDTO)
         {
-            if (category == null)
+            if (categoryDTO == null)
             {
                 return BadRequest("Category data is invalid.");
             }
+
+            var category = categoryDTO.MapToCategory();
 
             var newCategory = await _dbTransaction.CategoryRepository.InsertCategoryAsync(category);
             _dbTransaction.Commit();
@@ -68,21 +73,29 @@ namespace APICatalog.APICatalog.API.Controllers
             {
                 return BadRequest("Category could not be created.");
             }
-            return CreatedAtRoute("GetCategoryById", new { id = newCategory.CategoryId }, newCategory);
+
+            var newCategoryDTO = newCategory.MapToCategoryDTO();
+
+
+            return CreatedAtRoute("GetCategoryById", new { id = newCategoryDTO.CategoryId }, newCategoryDTO);
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult<Category>> UpdateCategory(int id, [FromBody] Category category)
+        public async Task<ActionResult<CategoryDTO>> UpdateCategory(int id, [FromBody] CategoryDTO categoryDTO)
         {
-            if (category == null)
+            if (categoryDTO == null)
             {
                 return BadRequest("Category data is invalid.");
             }
 
+            var category = categoryDTO.MapToCategory();
+
             var updatedCategory = await _dbTransaction.CategoryRepository.UpdateCategoryAsync(id, category);
             _dbTransaction.Commit();
 
-            return Ok(updatedCategory);
+            var updatedCategoryDTO = updatedCategory.MapToCategoryDTO();
+
+            return Ok(updatedCategoryDTO);
         }
 
         [HttpDelete("{id:int}")]
