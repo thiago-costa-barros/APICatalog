@@ -1,6 +1,9 @@
 ﻿using APICatalog.API.DTOs;
+using APICatalog.API.DTOs.Common;
+using APICatalog.API.DTOs.Common.Mapping;
 using APICatalog.API.DTOs.Mapping;
 using APICatalog.APICatalog.Core.Entities.Models;
+using APICatalog.Core.Common.Pagination;
 using APICatalog.Data.Context;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,17 +21,21 @@ namespace APICatalog.APICatalog.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetAllCategories()
+        public async Task<ActionResult<PagedResponseDTO<CategoryDTO>>> GetCategoriesPaged([FromQuery] PaginationParams paginationParams)
         {
-            var categories = await _dbTransaction.CategoryRepository.GetAllCategoriesAsync();
+            var categories = await _dbTransaction.CategoryRepository.GetCategoriesPaged(paginationParams);
             if (categories is null)
             {
                 return NotFound("Categories not found...");
             }
-
             var categoriesDTO = categories.MapToCategoryDTOList();
-
-            return Ok(categoriesDTO);
+            var pagedCategoriesDTO = new PagedList<CategoryDTO>(
+                categoriesDTO.ToList(),
+                categories.TotalCount,
+                categories.CurrentPage,
+                categories.PageSize
+                ).MapToPagedResponseDTO();
+            return Ok(pagedCategoriesDTO);
         }
 
         [HttpGet("products")]
