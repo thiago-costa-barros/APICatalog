@@ -62,10 +62,31 @@ namespace APICatalog.Data.Repositories.DAOs
             return product;
         }
 
-        public async Task<Product> InsertProductAsync(Product product)
+        public async Task<Product?> InsertProductAsync(Product product)
         {
-            await _context.Products.AddAsync(product);
-            return product;
+            var procedure = await _context.Products
+                .FromSqlRaw("""
+                EXEC 
+                    InsertProduct 
+                    @ProductName, 
+                    @Description, 
+                    @ImageUrl, 
+                    @Price, 
+                    @Stock,
+                    @CategoryId
+                """,
+                new SqlParameter("@ProductName", product.ProductName),
+                new SqlParameter("@Description", product.Description ?? (object)DBNull.Value),
+                new SqlParameter("@ImageUrl", product.ImageUrl),
+                new SqlParameter("@Price", product.Price),
+                new SqlParameter("@Stock", product.Stock),
+                new SqlParameter("@CategoryId", product.CategoryId))
+                .AsNoTracking()
+                .ToListAsync();
+
+            var insertProduct = procedure.FirstOrDefault();
+
+            return insertProduct;
         }
 
         public async Task<Product?> UpdateProductAsync(int id, Product product)
