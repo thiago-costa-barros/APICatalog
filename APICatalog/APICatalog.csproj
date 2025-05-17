@@ -19,8 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="API\DTOs\Categories\" />
-    <Folder Include="API\DTOs\Products\" />
     <Folder Include="API\Middlewares\" />
     <Folder Include="Core\Services\" />
   </ItemGroup>

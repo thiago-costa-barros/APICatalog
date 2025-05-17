@@ -1,4 +1,9 @@
-﻿using APICatalog.APICatalog.Core.Entities.Models;
+﻿using APICatalog.API.DTOs;
+using APICatalog.API.DTOs.Common;
+using APICatalog.API.DTOs.Common.Mapping;
+using APICatalog.API.DTOs.Mapping;
+using APICatalog.APICatalog.Core.Entities.Models;
+using APICatalog.Core.Common.Pagination;
 using APICatalog.Data.Context;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,14 +21,21 @@ namespace APICatalog.APICatalog.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetAllCategories()
+        public async Task<ActionResult<PagedResponseDTO<CategoryDTO>>> GetCategoriesPaged([FromQuery] PaginationParams paginationParams)
         {
-            var categories = await _dbTransaction.CategoryRepository.GetAllCategoriesAsync();
+            var categories = await _dbTransaction.CategoryRepository.GetCategoriesPaged(paginationParams);
             if (categories is null)
             {
                 return NotFound("Categories not found...");
             }
-            return Ok(categories);
+            var categoriesDTO = categories.MapToCategoryDTOList();
+            var pagedCategoriesDTO = new PagedList<CategoryDTO>(
+                categoriesDTO.ToList(),
+                categories.TotalCount,
+                categories.CurrentPage,
+                categories.PageSize
+                ).MapToPagedResponseDTO();
+            return Ok(pagedCategoriesDTO);
         }
 
         [HttpGet("products")]
@@ -38,23 +50,28 @@ namespace APICatalog.APICatalog.API.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetCategoryById")]
-        public async Task<ActionResult<Category>> GetCategoryById(int id)
+        public async Task<ActionResult<CategoryDTO>> GetCategoryById(int id)
         {
             var category = await _dbTransaction.CategoryRepository.GetCategoryByIdAsync(id);
             if (category == null)
             {
                 return NotFound("Category not found...");
             }
-            return Ok(category);
+
+            var categoryDTO = category.MapToCategoryDTO();
+
+            return Ok(categoryDTO);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Category>> InsertCategory([FromBody] Category category)
+        public async Task<ActionResult<CategoryDTO>> InsertCategory([FromBody] CategoryDTO categoryDTO)
         {
-            if (category == null)
+            if (categoryDTO == null)
             {
                 return BadRequest("Category data is invalid.");
             }
+
+            var category = categoryDTO.MapToCategory();
 
             var newCategory = await _dbTransaction.CategoryRepository.InsertCategoryAsync(category);
             _dbTransaction.Commit();
@@ -63,21 +80,29 @@ namespace APICatalog.APICatalog.API.Controllers
             {
                 return BadRequest("Category could not be created.");
             }
-            return CreatedAtRoute("GetCategoryById", new { id = newCategory.CategoryId }, newCategory);
+
+            var newCategoryDTO = newCategory.MapToCategoryDTO();
+
+
+            return CreatedAtRoute("GetCategoryById", new { id = newCategoryDTO.CategoryId }, newCategoryDTO);
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult<Category>> UpdateCategory(int id, [FromBody] Category category)
+        public async Task<ActionResult<CategoryDTO>> UpdateCategory(int id, [FromBody] CategoryDTO categoryDTO)
         {
-            if (category == null)
+            if (categoryDTO == null)
             {
                 return BadRequest("Category data is invalid.");
             }
 
+            var category = categoryDTO.MapToCategory();
+
             var updatedCategory = await _dbTransaction.CategoryRepository.UpdateCategoryAsync(id, category);
             _dbTransaction.Commit();
 
-            return Ok(updatedCategory);
+            var updatedCategoryDTO = updatedCategory.MapToCategoryDTO();
+
+            return Ok(updatedCategoryDTO);
         }
 
         [HttpDelete("{id:int}")]

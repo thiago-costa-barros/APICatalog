@@ -1,5 +1,7 @@
 ﻿using APICatalog.APICatalog.Core.Entities.Models;
 using APICatalog.APICataolog.Data.Context;
+using APICatalog.Core.Common.Pagination;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace APICatalog.Data.Repositories.DAOs
@@ -29,6 +31,34 @@ namespace APICatalog.Data.Repositories.DAOs
                 .ToListAsync();
         }
 
+        public async Task<PagedList<Category>> GetCategoriesPaged(PaginationParams paginationParams)
+        {
+            var categories = await _context.Categories
+                .FromSqlRaw(
+                """
+                EXEC
+                    GetCategoriesPaged 
+                    @PageNumber, 
+                    @PageSize
+                """,
+                    new SqlParameter("@PageNumber", paginationParams.PageNumber),
+                    new SqlParameter("@PageSize", paginationParams.PageSize))
+                .AsNoTracking()
+                .ToListAsync();
+            var totalCount = await _context.Categories
+                .Where(c => c.DeletionDate == null)
+                .CountAsync();
+
+            var categoriesPaged = new PagedList<Category>(
+                categories,
+                totalCount,
+                paginationParams.PageNumber,
+                paginationParams.PageSize
+            );
+
+            return categoriesPaged;
+        }
+
         public async Task<Category?> GetCategoryByIdAsync(int id)
         {
             var category = _context.Categories
@@ -42,8 +72,23 @@ namespace APICatalog.Data.Repositories.DAOs
 
         public async Task<Category> InsertCategoryAsync(Category category)
         {
-            await _context.Categories.AddAsync(category);
-            return category;
+            var procedure = await _context.Categories
+                .FromSqlRaw("""
+                EXEC
+                    InsertCategory 
+                    @CategoryName, 
+                    @Description, 
+                    @ImageUrl
+                """,
+                new SqlParameter("@CategoryName", category.CategoryName),
+                new SqlParameter("@Description", category.Description),
+                new SqlParameter("@ImageUrl", category.ImageUrl))
+                .AsNoTracking()
+                .ToListAsync();
+
+            var insertCategory = procedure.FirstOrDefault();
+
+            return insertCategory;
         }
 
         public async Task<Category?> UpdateCategoryAsync(int id, Category category)

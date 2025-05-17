@@ -1,4 +1,5 @@
 ﻿using APICatalog.APICatalog.Core.Entities.Models;
+using APICatalog.Core.Common.Pagination;
 using APICatalog.Data.Repositories.DAOs;
 using APICatalog.Data.Repositories.Interfaces;
 
@@ -35,6 +36,11 @@ namespace APICatalog.Data.Repositories
         public async Task<bool> RemoveProductAsync(int id)
         {
             return await _productDAO.RemoveProductAsync(id);
+        }
+
+        public async Task<PagedList<Product>> GetProductsPaged(PaginationParams paginationParams)
+        {
+            return await _productDAO.GetProductsPaged(paginationParams);
         }
 
     }
