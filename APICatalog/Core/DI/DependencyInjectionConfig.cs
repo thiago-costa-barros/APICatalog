@@ -1,4 +1,6 @@
 ﻿using APICatalog.APICataolog.Data.Context;
+using APICatalog.Core.Services;
+using APICatalog.Core.Services.Interfaces;
 using APICatalog.Data.Context;
 using APICatalog.Data.Repositories;
 using APICatalog.Data.Repositories.DAOs;
@@ -31,13 +33,17 @@ namespace APICatalog.Core.DI
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             // Add your application services here
+            services.AddScoped<IUserService, UserService>();
+
             return services;
         }
         public static IServiceCollection AddRepositories(this IServiceCollection services)
         {
             // Add your application repositories here
             services.AddScoped<ICategoryRepository, CategoryRepository>();
-            services.AddScoped<IProductRepository, ProductRepository>(); ;
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IAuthRepository, AuthRepository>();
 
             return services;
         }
@@ -46,6 +52,8 @@ namespace APICatalog.Core.DI
             // Add your DAOs here
             services.AddScoped<CategoryDAO>();
             services.AddScoped<ProductDAO>();
+            services.AddScoped<UserDAO>();
+            services.AddScoped<AuthDAO>();
 
             return services;
         }
