@@ -4,8 +4,10 @@ using APICatalog.API.DTOs.Common.Mapping;
 using APICatalog.API.DTOs.Mapping;
 using APICatalog.APICatalog.Core.Entities.Models;
 using APICatalog.Core.Common.Pagination;
+using APICatalog.Core.Services.Interfaces;
 using APICatalog.Data.Context;
 using Microsoft.AspNetCore.Mvc;
+using APICatalog.Core.Common;
 
 namespace APICatalog.APICatalog.API.Controllers
 {
@@ -14,10 +16,12 @@ namespace APICatalog.APICatalog.API.Controllers
     public class CategoriesController : ControllerBase
     {
         private readonly IDbTransaction _dbTransaction;
+        private readonly IUserService _userService;
 
-        public CategoriesController(IDbTransaction dbTransaction)
+        public CategoriesController(IDbTransaction dbTransaction, IUserService userService)
         {
             _dbTransaction = dbTransaction;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -66,6 +70,8 @@ namespace APICatalog.APICatalog.API.Controllers
         [HttpPost]
         public async Task<ActionResult<CategoryDTO>> InsertCategory([FromBody] CategoryDTO categoryDTO)
         {
+            var userId = await _userService.GetOrCreateUserSystemAsync(PublicEnum.UserType.ApiMethod);
+
             if (categoryDTO == null)
             {
                 return BadRequest("Category data is invalid.");
