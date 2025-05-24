@@ -1,7 +1,7 @@
 ﻿using APICatalog.Core.Common.Resources;
 using System.ComponentModel.DataAnnotations;
 
-namespace APICatalog.Core.Common
+namespace APICatalog.Core.Common.Enum
 {
     public class PublicEnum
     {

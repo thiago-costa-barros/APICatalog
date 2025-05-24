@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
-namespace APICatalog.Core.Common
+namespace APICatalog.Core.Common.Enum
 {
     public static class EnumExtensions
     {
-        public static string GetDisplayName(this Enum enumValue)
+        public static string GetDisplayName(this System.Enum enumValue)
         {
             var member = enumValue.GetType().GetMember(enumValue.ToString()).FirstOrDefault();
             if (member == null) return enumValue.ToString();
