@@ -1,5 +1,6 @@
 ﻿using APICatalog.APICataolog.Data.Context;
 using APICatalog.Core.Services;
+using APICatalog.Core.Services.Helpers;
 using APICatalog.Core.Services.Interfaces;
 using APICatalog.Data.Context;
 using APICatalog.Data.Repositories;
@@ -34,6 +35,8 @@ namespace APICatalog.Core.DI
         {
             // Add your application services here
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ITokenServiceHelper, TokenServiceHelper>();
 
             return services;
         }
