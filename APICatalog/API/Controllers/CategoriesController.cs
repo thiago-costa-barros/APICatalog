@@ -70,8 +70,6 @@ namespace APICatalog.APICatalog.API.Controllers
         [HttpPost]
         public async Task<ActionResult<CategoryDTO>> InsertCategory([FromBody] CategoryDTO categoryDTO)
         {
-            var userId = await _userService.GetOrCreateUserSystemAsync(PublicEnum.UserType.ApiMethod);
-
             if (categoryDTO == null)
             {
                 return BadRequest("Category data is invalid.");
