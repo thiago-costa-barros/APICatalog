@@ -1,12 +1,12 @@
 ﻿using APICatalog.APICatalog.Core.Entities.Models;
 using APICatalog.APICatalog.Core.Entities.Models.Base;
-using static APICatalog.Core.Common.PublicEnum;
+using static APICatalog.Core.Common.Enum.PublicEnum;
 
 namespace APICatalog.Core.Entities.Models
 {
     public class UserToken: AuditableEntity
     {
-        public int UserTokkenId { get; set; }
+        public int UserTokenId { get; set; }
         public int UserId { get; set; }
         public string JwtToken { get; set; } = string.Empty;
         public DateTime ExpirationDate { get; set; }
