@@ -1,5 +1,5 @@
 ﻿using APICatalog.APICatalog.Core.Entities.Models;
-using APICatalog.Core.Common;
+using APICatalog.Core.Common.Enum;
 using APICatalog.Core.Entities.Models;
 using System.Runtime.CompilerServices;
 

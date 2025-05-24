@@ -1,6 +1,6 @@
 ﻿using APICatalog.APICatalog.Core.Entities.Models.Base;
 using Microsoft.EntityFrameworkCore;
-using static APICatalog.Core.Common.PublicEnum;
+using static APICatalog.Core.Common.Enum.PublicEnum;
 
 namespace APICatalog.APICatalog.Core.Entities.Models;
 

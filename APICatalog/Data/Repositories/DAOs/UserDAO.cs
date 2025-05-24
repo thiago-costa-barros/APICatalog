@@ -1,10 +1,9 @@
 ﻿using APICatalog.APICatalog.Core.Entities.Models;
 using APICatalog.APICataolog.Data.Context;
-using APICatalog.Core.Common;
+using APICatalog.Core.Common.Enum;
 using Microsoft.EntityFrameworkCore;
-using Npgsql.TypeMapping;
 using System.Runtime.CompilerServices;
-using static APICatalog.Core.Common.PublicEnum;
+using static APICatalog.Core.Common.Enum.PublicEnum;
 
 namespace APICatalog.Data.Repositories.DAOs
 {
@@ -47,7 +46,7 @@ namespace APICatalog.Data.Repositories.DAOs
 
             if (existingUser != null) return existingUser;
 
-            string typeDescription = type.GetDisplayName();
+            string typeDescription = type.ToString();
 
             var newUser = new User
             {

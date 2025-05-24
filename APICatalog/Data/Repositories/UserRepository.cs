@@ -1,5 +1,5 @@
 ﻿using APICatalog.APICatalog.Core.Entities.Models;
-using APICatalog.Core.Common;
+using APICatalog.Core.Common.Enum;
 using APICatalog.Data.Repositories.DAOs;
 using APICatalog.Data.Repositories.Interfaces;
 using System.Runtime.CompilerServices;
@@ -14,39 +14,39 @@ namespace APICatalog.Data.Repositories
             _userDAO = userDAO;
         }
 
-        public Task<User?> CreateUserAsync(User user)
+        public Task<User?> CreateUserRepository(User user)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<User?> GetOrCreateUserSystemAsync(PublicEnum.UserType type, [CallerMemberName] string method = "")
+        public async Task<User?> GetOrCreateUserSystemRepository(PublicEnum.UserType type, [CallerMemberName] string method = "")
         {
             var userSystem = await _userDAO.GetOrCreateUserSystemAsync(type, method);
 
             return userSystem;
         }
 
-        public Task<User?> GetUserByIdAsync(int userId)
+        public Task<User?> GetUserByIdRepository(int userId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<User?> GetUserByEmailAsync(string email)
+        public Task<User?> GetUserByEmailRepository(string email)
         {
             throw new NotImplementedException();
         }
 
-        public Task<User?> GetUserByLoginAsync(string login)
+        public Task<User?> GetUserByLoginRepository(string login)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> RemoveUserAsync(int userId)
+        public Task<bool> RemoveUserRepository(int userId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<User?> UpdateUserAsync(int userId, User user)
+        public Task<User?> UpdateUserRepository(int userId, User user)
         {
             throw new NotImplementedException();
         }

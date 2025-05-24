@@ -1,17 +1,17 @@
 ﻿using APICatalog.APICatalog.Core.Entities.Models;
-using APICatalog.Core.Common;
+using APICatalog.Core.Common.Enum;
 using System.Runtime.CompilerServices;
 
 namespace APICatalog.Data.Repositories.Interfaces
 {
     public interface IUserRepository
     {
-        Task<User?> GetUserByIdAsync(int userId);
-        Task<User?> GetUserByLoginAsync(string login);
-        Task<User?> GetUserByEmailAsync(string email);
-        Task<User?> CreateUserAsync(User user);
-        Task<User?> GetOrCreateUserSystemAsync(PublicEnum.UserType type, [CallerMemberName] string method = "");
-        Task<User?> UpdateUserAsync(int userId, User user);
-        Task<bool> RemoveUserAsync(int userId);
+        Task<User?> GetUserByIdRepository(int userId);
+        Task<User?> GetUserByLoginRepository(string login);
+        Task<User?> GetUserByEmailRepository(string email);
+        Task<User?> CreateUserRepository(User user);
+        Task<User?> GetOrCreateUserSystemRepository(PublicEnum.UserType type, [CallerMemberName] string method = "");
+        Task<User?> UpdateUserRepository(int userId, User user);
+        Task<bool> RemoveUserRepository(int userId);
     }
 }
