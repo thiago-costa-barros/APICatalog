@@ -42,15 +42,15 @@ namespace APICatalog.Data.Repositories.DAOs
 
         public async Task<User?> GetOrCreateUserSystemAsync(UserType type, [CallerMemberName] string method="")
         {
-            var existingUser = await GetUserByLoginAsync(method);
+            string typeDescription = type.ToString();
+            var login = $"{method}_{typeDescription}";
+            var existingUser = await GetUserByLoginAsync(login);
 
             if (existingUser != null) return existingUser;
 
-            string typeDescription = type.ToString();
-
-            var newUser = new User
+           var newUser = new User
             {
-                Login = $"{method}_{typeDescription}",
+                Login = login,
                 Type = type,
                 IsAdmin = true
             };
