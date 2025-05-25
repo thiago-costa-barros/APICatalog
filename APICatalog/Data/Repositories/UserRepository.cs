@@ -14,9 +14,11 @@ namespace APICatalog.Data.Repositories
             _userDAO = userDAO;
         }
 
-        public Task<User?> CreateUserRepository(User user)
+        public async Task<User?> CreateUserRepository(User user)
         {
-            throw new NotImplementedException();
+            var createdUser = await _userDAO.CreateUserAsync(user);
+
+            return createdUser;
         }
 
         public async Task<User?> GetOrCreateUserSystemRepository(PublicEnum.UserType type, [CallerMemberName] string method = "")
@@ -31,14 +33,18 @@ namespace APICatalog.Data.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<User?> GetUserByEmailRepository(string email)
+        public async Task<User?> GetUserByEmailRepository(string email)
         {
-            throw new NotImplementedException();
+            var user = await _userDAO.GetUserByEmailAsync(email);
+
+            return user;
         }
 
-        public Task<User?> GetUserByLoginRepository(string login)
+        public async Task<User?> GetUserByLoginRepository(string login)
         {
-            throw new NotImplementedException();
+            var user = await _userDAO.GetUserByLoginAsync(login);
+
+            return user;
         }
 
         public Task<bool> RemoveUserRepository(int userId)

@@ -8,5 +8,6 @@ namespace APICatalog.Core.Services.Interfaces
     public interface IUserService
     {
         Task<User?> GetOrCreateUserSystemAsync(PublicEnum.UserType type, [CallerMemberName] string method = "");
+        Task<User?> RegisterUserService(User user);
     }
 }
