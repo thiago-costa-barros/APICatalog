@@ -21,9 +21,6 @@ builder.Services.Configure<RouteOptions>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//var stringPostgres = builder.Configuration.GetConnectionString("DefaultConnectionPostgres");
-//builder.Services.AddDbContext<AppDbContext>(options =>
-//    options.UseNpgsql(stringPostgres));
 var stringSqlServer = builder.Configuration.GetConnectionString("DefaultConnectionSqlServer");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(stringSqlServer));
