@@ -27,10 +27,10 @@ namespace APICatalog.Core.Services
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
-            var existingUserByLogin = string.IsNullOrEmpty(user.Login) ? await _userRepository.GetUserByLoginRepository(user.Login) : null;
+            var existingUserByLogin = !string.IsNullOrEmpty(user.Login) ? await _userRepository.GetUserByLoginRepository(user.Login) : null;
             if (existingUserByLogin != null) throw new ArgumentException("User with this login already exists.");
 
-            var existingUserByEmail = string.IsNullOrEmpty(user.Email) ? await _userRepository.GetUserByEmailRepository(user.Email) : null;
+            var existingUserByEmail = !string.IsNullOrEmpty(user.Email) ? await _userRepository.GetUserByEmailRepository(user.Email) : null;
             if (existingUserByEmail != null) throw new ArgumentException("User with this email already exists.");
 
             var newUser = await _userRepository.CreateUserRepository(user);
