@@ -20,6 +20,7 @@ namespace APICatalog.Core.Services.Helpers
         public TokenReponseDTO GenerateToken(User user)
         {
             var accessTokenIdentifier = Guid.NewGuid();
+            var refreshTokenIdentifier = Guid.NewGuid();
 
             var claims = new []
             {
@@ -50,7 +51,8 @@ namespace APICatalog.Core.Services.Helpers
                 RefreshToken = Guid.NewGuid().ToString(),
                 ExpirationDate = accessToken.ValidTo,
                 UserId = user.UserId,
-                Identifier = accessTokenIdentifier
+                AccessIdentifier = accessTokenIdentifier,
+                RefreshIdentifier = refreshTokenIdentifier
             };
 
 

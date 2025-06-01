@@ -39,8 +39,8 @@ namespace APICatalog.Core.Services
             var hashedAccessToken = _authServiceHelper.HashToken(tokens.AccessToken);
             var hashedRefreshToken = _authServiceHelper.HashToken(tokens.RefreshToken);
 
-            var accessIdentifier = tokens.Identifier;
-            var refreshIdentifier = Guid.NewGuid();
+            var accessIdentifier = tokens.AccessIdentifier;
+            var refreshIdentifier = tokens.RefreshIdentifier;
 
             var dbAccessToken = await _authRepository.InsertTokenRepository(user.UserId, PublicEnum.TokenType.AccessToken, hashedAccessToken, tokens.ExpirationDate, accessIdentifier);
             var dbRefreshToken = await _authRepository.InsertTokenRepository(user.UserId, PublicEnum.TokenType.RefreshToken, hashedRefreshToken, refreshTokenExpirationDate, refreshIdentifier);
@@ -75,8 +75,9 @@ namespace APICatalog.Core.Services
             if(string.IsNullOrEmpty(refreshTokenDTO.RefreshToken))
                 throw new ArgumentNullException(nameof(refreshTokenDTO), "Refresh token cannot be null or empty.");
 
-
-            UserToken userToken = await _authRepository.GetTokenByIdentifierRepository(refreshTokenDTO.Identifier, PublicEnum.TokenType.RefreshToken);
+            UserToken? userToken = await _authRepository.GetTokenByIdentifierRepository(refreshTokenDTO.Identifier, PublicEnum.TokenType.RefreshToken);
+            if(userToken == null)
+                throw new UnauthorizedAccessException("Invalid token.");
 
             await RevokeAllTokensByUserIdService(userToken.UserId);
 
