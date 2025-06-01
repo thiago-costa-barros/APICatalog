@@ -19,12 +19,12 @@ namespace APICatalog.Core.Services.Helpers
         }
         public TokenReponseDTO GenerateToken(User user)
         {
-            var identifier = Guid.NewGuid();
+            var accessTokenIdentifier = Guid.NewGuid();
 
             var claims = new []
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
-                new Claim(JwtRegisteredClaimNames.Jti, identifier.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, accessTokenIdentifier.ToString()),
                 new Claim(ClaimTypes.Email, user.Email ?? ""),
                 new Claim("IsAdmin", user.IsAdmin.ToString()),
                 new Claim("IsActive", user.IsActive.ToString()),
@@ -50,7 +50,7 @@ namespace APICatalog.Core.Services.Helpers
                 RefreshToken = Guid.NewGuid().ToString(),
                 ExpirationDate = accessToken.ValidTo,
                 UserId = user.UserId,
-                Identifier = identifier
+                Identifier = accessTokenIdentifier
             };
 
 

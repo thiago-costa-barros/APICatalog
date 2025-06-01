@@ -5,6 +5,8 @@ using APICatalog.Core.Services.Interfaces;
 using APICatalog.Data.Repositories.Interfaces;
 using APICatalog.Core.Common.Enum;
 using APICatalog.Core.Entities.Models;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace APICatalog.Core.Services
 {
@@ -14,12 +16,14 @@ namespace APICatalog.Core.Services
         private readonly IAuthRepository _authRepository;
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _config;
-        public AuthService(IAuthServiceHelper authServiceHelper, IAuthRepository authRepository, IUserRepository userRepository, IConfiguration config)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public AuthService(IAuthServiceHelper authServiceHelper, IAuthRepository authRepository, IUserRepository userRepository, IConfiguration config, IHttpContextAccessor httpContextAccessor)
         {
             _authServiceHelper = authServiceHelper;
             _authRepository = authRepository;
             _userRepository = userRepository;
             _config = config;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<TokenReponseDTO> GenerateAndSaveTokens(User user)
@@ -31,11 +35,15 @@ namespace APICatalog.Core.Services
             if (!double.TryParse(_config["Jwt:RefreshTokenExpirationDays"], out var refreshDays))
                 throw new Exception("Invalid configuration for RefreshTokenExpirationDays.");
             var refreshTokenExpirationDate = DateTime.UtcNow.AddDays(refreshDays);
+
             var hashedAccessToken = _authServiceHelper.HashToken(tokens.AccessToken);
             var hashedRefreshToken = _authServiceHelper.HashToken(tokens.RefreshToken);
 
-            var dbAccessToken = await _authRepository.InsertTokenRepository(user.UserId, PublicEnum.TokenType.AccessToken, hashedAccessToken, tokens.ExpirationDate, tokens.Identifier);
-            var dbRefreshToken = await _authRepository.InsertTokenRepository(user.UserId, PublicEnum.TokenType.RefreshToken, hashedRefreshToken, refreshTokenExpirationDate, tokens.Identifier);
+            var accessIdentifier = tokens.Identifier;
+            var refreshIdentifier = Guid.NewGuid();
+
+            var dbAccessToken = await _authRepository.InsertTokenRepository(user.UserId, PublicEnum.TokenType.AccessToken, hashedAccessToken, tokens.ExpirationDate, accessIdentifier);
+            var dbRefreshToken = await _authRepository.InsertTokenRepository(user.UserId, PublicEnum.TokenType.RefreshToken, hashedRefreshToken, refreshTokenExpirationDate, refreshIdentifier);
 
             return tokens;
         }
@@ -68,14 +76,7 @@ namespace APICatalog.Core.Services
                 throw new ArgumentNullException(nameof(refreshTokenDTO), "Refresh token cannot be null or empty.");
 
 
-            UserToken? userToken = await _authRepository.GetTokenRepository(refreshTokenDTO.RefreshToken, PublicEnum.TokenType.RefreshToken);
-            if (userToken is null)
-                throw new UnauthorizedAccessException("Invalid refresh token.");
-            if (userToken.ExpirationDate < DateTime.UtcNow)
-            {
-                await RevokeTokenByUserIdAndTokenTypeService(userToken.UserId, userToken.Identifier, PublicEnum.TokenType.RefreshToken);
-                throw new UnauthorizedAccessException("Refresh token expired.");
-            }
+            UserToken userToken = await _authRepository.GetTokenByIdentifierRepository(refreshTokenDTO.Identifier, PublicEnum.TokenType.RefreshToken);
 
             await RevokeAllTokensByUserIdService(userToken.UserId);
 
@@ -104,9 +105,32 @@ namespace APICatalog.Core.Services
             await _authRepository.RevokeUserTokenRepository(userId, identifier, type);
         }
 
-        public Task<TokenValidationResultDTO> ValidateTokenService(string token)
+        public async Task<UserToken> ValidateAccessTokenService(string token)
         {
-            throw new NotImplementedException();
+            var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
+            var jtiClaim = _httpContextAccessor.HttpContext?.User.FindFirst(JwtRegisteredClaimNames.Jti);
+
+            if (userIdClaim == null || jtiClaim == null)
+                throw new UnauthorizedAccessException("Invalid token claims.");
+
+            int userId = int.Parse(userIdClaim.Value);
+            Guid identifier = Guid.Parse(jtiClaim.Value);
+
+            UserToken? userToken = await _authRepository.GetTokenByIdentifierRepository(identifier, PublicEnum.TokenType.AccessToken);
+            if (userToken == null || userToken.UserId != userId)
+                throw new UnauthorizedAccessException("Invalid token.");
+
+            if (userToken.ExpirationDate < DateTime.UtcNow)
+            {
+                await RevokeTokenByUserIdAndTokenTypeService(userToken.UserId, userToken.Identifier, PublicEnum.TokenType.AccessToken);
+                throw new UnauthorizedAccessException("Expired token.");
+            }
+
+            var isValid = _authServiceHelper.VerifyTokenHasher(token, userToken.JwtToken);
+            if (!isValid)
+                throw new UnauthorizedAccessException("Token hash mismatch.");
+
+            return userToken;
         }
     }
 }

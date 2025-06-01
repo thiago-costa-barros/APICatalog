@@ -1,5 +1,6 @@
 ﻿using APICatalog.API.DTOs;
 using APICatalog.Core.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -16,6 +17,7 @@ namespace APICatalog.API.Controllers
             _authService = authService;
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] AuthLoginRequestDTO loginRequestDTO)
         {
@@ -28,6 +30,7 @@ namespace APICatalog.API.Controllers
             return Ok(token);
         }
 
+        [AllowAnonymous]
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] AuthRefreshRequestDTO refreshTokenDTO)
         {

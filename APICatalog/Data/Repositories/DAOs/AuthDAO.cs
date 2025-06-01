@@ -30,17 +30,6 @@ namespace APICatalog.Data.Repositories.DAOs
 
             return createToken;
         }
-        public async Task<UserToken?> GetTokenDAO(string token, PublicEnum.TokenType type)
-        {
-            var userToken = await _context.UserTokens
-                .Where(x => 
-                x.JwtToken == token 
-                && x.Type == type 
-                && x.Status == PublicEnum.TokenStatus.Active)
-                .FirstOrDefaultAsync();
-
-            return userToken;
-        }
         public async Task<UserToken?> GetTokenByIdentifierDAO(Guid identifier, PublicEnum.TokenType type)
         {
             var userToken = await _context.UserTokens

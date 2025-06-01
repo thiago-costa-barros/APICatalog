@@ -21,13 +21,6 @@ namespace APICatalog.Data.Repositories
             return userToken;
         }
 
-        public async Task<UserToken?> GetTokenRepository(string token, PublicEnum.TokenType type)
-        {
-            var userToken = await _authDAO.GetTokenDAO(token, type);
-
-            return userToken;
-        }
-
         public async Task<IEnumerable<UserToken?>> GetTokensByUserIdRepository(int userId)
         {
             var tokens = await _authDAO.GetAllTokensByUserIdDAO(userId);
