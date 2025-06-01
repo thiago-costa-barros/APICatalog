@@ -11,7 +11,6 @@ namespace APICatalog.Core.Services.Interfaces
         Task<TokenReponseDTO> RefreshTokenService(AuthRefreshRequestDTO refreshTokenDTO);
         Task<TokenReponseDTO> GenerateAndSaveTokens(User user);
         Task<bool> LogoutService(int userId,string token);
-        Task RevokeTokenByUserIdAndTokenTypeService(int userId, string token, PublicEnum.TokenType type);
         Task RevokeAllTokensByUserIdService(int userId);
     }
 }

@@ -5,6 +5,7 @@ namespace APICatalog.API.DTOs
     public class TokenReponseDTO
     {
         public int UserId { get; set; }
+        public Guid Identifier { get; set; }
         public string? AccessToken { get; set; }
         public string? RefreshToken { get; set; }
         public DateTime ExpirationDate { get; set; }

@@ -34,8 +34,8 @@ namespace APICatalog.Core.Services
             var hashedAccessToken = _authServiceHelper.HashToken(tokens.AccessToken);
             var hashedRefreshToken = _authServiceHelper.HashToken(tokens.RefreshToken);
 
-            var dbAccessToken = await _authRepository.InsertTokenRepository(user.UserId, PublicEnum.TokenType.AccessToken, hashedAccessToken, tokens.ExpirationDate);
-            var dbRefreshToken = await _authRepository.InsertTokenRepository(user.UserId, PublicEnum.TokenType.RefreshToken, hashedRefreshToken, refreshTokenExpirationDate);
+            var dbAccessToken = await _authRepository.InsertTokenRepository(user.UserId, PublicEnum.TokenType.AccessToken, hashedAccessToken, tokens.ExpirationDate, tokens.Identifier);
+            var dbRefreshToken = await _authRepository.InsertTokenRepository(user.UserId, PublicEnum.TokenType.RefreshToken, hashedRefreshToken, refreshTokenExpirationDate, tokens.Identifier);
 
             return tokens;
         }
@@ -73,7 +73,7 @@ namespace APICatalog.Core.Services
                 throw new UnauthorizedAccessException("Invalid refresh token.");
             if (userToken.ExpirationDate < DateTime.UtcNow)
             {
-                await RevokeTokenByUserIdAndTokenTypeService(userToken.UserId, userToken.JwtToken, PublicEnum.TokenType.RefreshToken);
+                await RevokeTokenByUserIdAndTokenTypeService(userToken.UserId, userToken.Identifier, PublicEnum.TokenType.RefreshToken);
                 throw new UnauthorizedAccessException("Refresh token expired.");
             }
 
@@ -92,16 +92,16 @@ namespace APICatalog.Core.Services
 
             foreach (var token in existingTokens)
             {
-                await _authRepository.RevokeUserTokenRepository(userId, token.JwtToken, token.Type);
+                await _authRepository.RevokeUserTokenRepository(userId, token.Identifier, token.Type);
             }
         }
 
-        public async Task RevokeTokenByUserIdAndTokenTypeService(int userId, string token, PublicEnum.TokenType type)
+        public async Task RevokeTokenByUserIdAndTokenTypeService(int userId, Guid identifier, PublicEnum.TokenType type)
         {
-            var userToken = await _authRepository.GetTokenRepository(token, type);
+            var userToken = await _authRepository.GetTokenByIdentifierRepository(identifier, type);
             if (userToken == null || userToken.UserId != userId)
                 return;
-            await _authRepository.RevokeUserTokenRepository(userId, token, type);
+            await _authRepository.RevokeUserTokenRepository(userId, identifier, type);
         }
 
         public Task<TokenValidationResultDTO> ValidateTokenService(string token)

@@ -6,10 +6,11 @@ namespace APICatalog.Data.Repositories.Interfaces
 {
     public interface IAuthRepository
     {
-        Task<UserToken?> InsertTokenRepository(int userId, TokenType type, string token, DateTime expirationDate);
+        Task<UserToken?> InsertTokenRepository(int userId, TokenType type, string token, DateTime expirationDate, Guid identifier);
         Task<IEnumerable<UserToken?>> GetTokensByUserIdRepository(int userId);
         Task<UserToken?> GetTokenRepository(string token, TokenType type);
-        Task<bool> UpdateUserTokenRepository(int userId, string token, PublicEnum.TokenType type, PublicEnum.TokenStatus status);
-        Task<bool> RevokeUserTokenRepository(int userId, string token, PublicEnum.TokenType type);
+        Task<UserToken?> GetTokenByIdentifierRepository(Guid identifier, TokenType type);
+        Task<bool> UpdateUserTokenRepository(int userId, Guid identifier, PublicEnum.TokenType type, PublicEnum.TokenStatus status);
+        Task<bool> RevokeUserTokenRepository(int userId, Guid identifier, PublicEnum.TokenType type);
     }
 }

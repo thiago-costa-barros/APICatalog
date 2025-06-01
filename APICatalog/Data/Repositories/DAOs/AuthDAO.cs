@@ -14,11 +14,12 @@ namespace APICatalog.Data.Repositories.DAOs
             _context = context;
             _config = config;
         }
-        public async Task<UserToken?> InsertTokenDAO(int userId, PublicEnum.TokenType type, string token, DateTime expirationDate)
+        public async Task<UserToken?> InsertTokenDAO(int userId, PublicEnum.TokenType type, string token, DateTime expirationDate, Guid identifier)
         {
             var createToken = new UserToken
             {
                 UserId = userId,
+                Identifier = identifier,
                 JwtToken = token,
                 ExpirationDate = expirationDate,
                 Type = type,
@@ -40,6 +41,17 @@ namespace APICatalog.Data.Repositories.DAOs
 
             return userToken;
         }
+        public async Task<UserToken?> GetTokenByIdentifierDAO(Guid identifier, PublicEnum.TokenType type)
+        {
+            var userToken = await _context.UserTokens
+                .Where(x =>
+                x.Identifier == identifier
+                && x.Type == type
+                && x.Status == PublicEnum.TokenStatus.Active)
+                .FirstOrDefaultAsync();
+
+            return userToken;
+        }
 
         public async Task<IEnumerable<UserToken>> GetAllTokensByUserIdDAO(int userId)
         {
@@ -54,9 +66,9 @@ namespace APICatalog.Data.Repositories.DAOs
             return tokens;
         }
 
-        public async Task<UserToken?> UpdateUserTokenDAO(string token, PublicEnum.TokenType type, PublicEnum.TokenStatus status)
+        public async Task<UserToken?> UpdateUserTokenDAO(Guid identifier, PublicEnum.TokenType type, PublicEnum.TokenStatus status)
         {
-            var userToken = await GetTokenDAO(token, type);
+            var userToken = await GetTokenByIdentifierDAO(identifier, type);
             if (userToken != null)
             {
                 userToken.Status = status;
@@ -66,9 +78,9 @@ namespace APICatalog.Data.Repositories.DAOs
             return userToken;
         }
 
-        public async Task<UserToken?> RevokeUserTokenDAO(string token, PublicEnum.TokenType type)
+        public async Task<UserToken?> RevokeUserTokenDAO(Guid identifier, PublicEnum.TokenType type)
         {
-            var userToken = await GetTokenDAO(token, type);
+            var userToken = await GetTokenByIdentifierDAO(identifier, type);
             if (userToken != null)
             {
                 userToken.Status = PublicEnum.TokenStatus.Revoked;

@@ -12,6 +12,7 @@ namespace APICatalog.Core.Entities.Models
         public DateTime ExpirationDate { get; set; }
         public TokenType Type { get; set; }
         public TokenStatus Status { get; set; }
+        public Guid Identifier { get; set; }
 
         public User? User { get; set; } = null!;
     }
