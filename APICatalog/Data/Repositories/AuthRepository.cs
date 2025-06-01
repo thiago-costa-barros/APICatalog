@@ -13,14 +13,18 @@ namespace APICatalog.Data.Repositories
         {
             _authDAO = authDAO;
         }
-        public Task<UserToken?> GetTokenRepository(string accessToken)
+        public async Task<UserToken?> GetTokenRepository(string token, PublicEnum.TokenType type)
         {
-            throw new NotImplementedException();
+            var userToken = await _authDAO.GetTokenDAO(token, type);
+
+            return userToken;
         }
 
-        public Task<IEnumerable<UserToken?>> GetTokensByUserIdRepository(int userId)
+        public async Task<IEnumerable<UserToken?>> GetTokensByUserIdRepository(int userId)
         {
-            throw new NotImplementedException();
+            var tokens = await _authDAO.GetAllTokensByUserIdDAO(userId);
+
+            return tokens;
         }
 
         public async Task<UserToken?> InsertTokenRepository(int userId, PublicEnum.TokenType type, string token, DateTime expirationDate)
@@ -30,14 +34,18 @@ namespace APICatalog.Data.Repositories
             return userToken;
         }
 
-        public Task<bool> RevokeAllTokensByUserIdRepository(int userId)
+        public async Task<bool> RevokeUserTokenRepository(int userId, string token, PublicEnum.TokenType type)
         {
-            throw new NotImplementedException();
+            await _authDAO.RevokeUserTokenDAO(token, type);
+            return true;
+
         }
 
-        public Task<bool> RevokeLatestTokenByUserIdRepository(int userId, PublicEnum.TokenType type)
+        public async Task<bool> UpdateUserTokenRepository(int userId, string token, PublicEnum.TokenType type , PublicEnum.TokenStatus status)
         {
-            throw new NotImplementedException();
+            await _authDAO.UpdateUserTokenDAO(token, type, status);
+            return true;
+
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using APICatalog.API.DTOs;
 using APICatalog.APICatalog.Core.Entities.Models;
+using APICatalog.Data.Repositories.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -7,12 +8,14 @@ using System.Text;
 
 namespace APICatalog.Core.Services.Helpers
 {
-    public class TokenServiceHelper : ITokenServiceHelper
+    public class AuthServiceHelper : IAuthServiceHelper
     {
         private readonly IConfiguration _config;
-        public TokenServiceHelper(IConfiguration config)
+        private readonly IAuthRepository _authRepository;
+        public AuthServiceHelper(IConfiguration config, IAuthRepository authRepository)
         {
             _config = config;
+            _authRepository = authRepository;
         }
         public TokenReponseDTO GenerateToken(User user)
         {
@@ -28,7 +31,7 @@ namespace APICatalog.Core.Services.Helpers
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var accessTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_config["Jwt:ExpirationInMinutes"]));
+            var accessTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_config["Jwt:AccessTokenExpirationMinutes"]));
 
             var accessToken = new JwtSecurityToken(
                 issuer: _config["Jwt:Issuer"],
@@ -50,9 +53,19 @@ namespace APICatalog.Core.Services.Helpers
             return response;
         }
 
-        public bool VerifyPasswordHaser(string hashedPassword, string requestPassword)
+        public string HashToken(string token)
         {
-            return BCrypt.Net.BCrypt.Verify(hashedPassword, requestPassword);
+            return BCrypt.Net.BCrypt.HashPassword(token);
+        }
+
+        public bool VerifyPasswordHasher(string requestPassword, string hashedPassword)
+        {
+            return BCrypt.Net.BCrypt.Verify(requestPassword, hashedPassword);
+        }
+
+        public bool VerifyTokenHasher(string requestToken, string hashedToken)
+        {
+            return BCrypt.Net.BCrypt.Verify(requestToken, hashedToken);
         }
     }
 }

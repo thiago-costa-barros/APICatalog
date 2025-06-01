@@ -29,5 +29,54 @@ namespace APICatalog.Data.Repositories.DAOs
 
             return createToken;
         }
+        public async Task<UserToken?> GetTokenDAO(string token, PublicEnum.TokenType type)
+        {
+            var userToken = await _context.UserTokens
+                .Where(x => 
+                x.JwtToken == token 
+                && x.Type == type 
+                && x.Status == PublicEnum.TokenStatus.Active)
+                .FirstOrDefaultAsync();
+
+            return userToken;
+        }
+
+        public async Task<IEnumerable<UserToken>> GetAllTokensByUserIdDAO(int userId)
+        {
+            var tokens = await _context.UserTokens
+                .Where(x =>
+                x.UserId == userId
+                && x.Status == PublicEnum.TokenStatus.Active
+                && x.DeletionDate == null)
+                .AsNoTracking()
+                .ToListAsync();
+
+            return tokens;
+        }
+
+        public async Task<UserToken?> UpdateUserTokenDAO(string token, PublicEnum.TokenType type, PublicEnum.TokenStatus status)
+        {
+            var userToken = await GetTokenDAO(token, type);
+            if (userToken != null)
+            {
+                userToken.Status = status;
+                _context.UserTokens.Update(userToken);
+                await _context.SaveChangesAsync();
+            }
+            return userToken;
+        }
+
+        public async Task<UserToken?> RevokeUserTokenDAO(string token, PublicEnum.TokenType type)
+        {
+            var userToken = await GetTokenDAO(token, type);
+            if (userToken != null)
+            {
+                userToken.Status = PublicEnum.TokenStatus.Revoked;
+                userToken.DeletionDate = DateTime.UtcNow;
+                _context.UserTokens.Update(userToken);
+                await _context.SaveChangesAsync();
+            }
+            return userToken;
+        }
     }
 }

@@ -36,7 +36,7 @@ namespace APICatalog.Core.DI
             // Add your application services here
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<ITokenServiceHelper, TokenServiceHelper>();
+            services.AddScoped<IAuthServiceHelper, AuthServiceHelper>();
 
             return services;
         }

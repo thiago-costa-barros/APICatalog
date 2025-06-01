@@ -28,9 +28,11 @@ namespace APICatalog.Data.Repositories
             return userSystem;
         }
 
-        public Task<User?> GetUserByIdRepository(int userId)
+        public async Task<User?> GetUserByIdRepository(int userId)
         {
-            throw new NotImplementedException();
+            var user = await _userDAO.GetUserByIdAsync(userId);
+
+            return user;
         }
 
         public async Task<User?> GetUserByEmailRepository(string email)
