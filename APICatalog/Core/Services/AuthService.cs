@@ -29,21 +29,17 @@ namespace APICatalog.Core.Services
         public async Task<TokenReponseDTO> GenerateAndSaveTokens(User user)
         {
             var tokens = _authServiceHelper.GenerateToken(user);
-            if (string.IsNullOrEmpty(tokens.AccessToken) || string.IsNullOrEmpty(tokens.RefreshToken))
+            if (string.IsNullOrEmpty(tokens.AccessToken.AccessToken) || string.IsNullOrEmpty(tokens.RefreshToken.RefreshToken))
                 throw new Exception("Failed to generate tokens.");
 
-            if (!double.TryParse(_config["Jwt:RefreshTokenExpirationDays"], out var refreshDays))
-                throw new Exception("Invalid configuration for RefreshTokenExpirationDays.");
-            var refreshTokenExpirationDate = DateTime.UtcNow.AddDays(refreshDays);
+            var hashedAccessToken = _authServiceHelper.HashToken(tokens.AccessToken.AccessToken);
+            var hashedRefreshToken = _authServiceHelper.HashToken(tokens.RefreshToken.RefreshToken);
 
-            var hashedAccessToken = _authServiceHelper.HashToken(tokens.AccessToken);
-            var hashedRefreshToken = _authServiceHelper.HashToken(tokens.RefreshToken);
+            var accessIdentifier = tokens.AccessToken.AccessIdentifier;
+            var refreshIdentifier = tokens.RefreshToken.RefreshIdentifier;
 
-            var accessIdentifier = tokens.AccessIdentifier;
-            var refreshIdentifier = tokens.RefreshIdentifier;
-
-            var dbAccessToken = await _authRepository.InsertTokenRepository(user.UserId, PublicEnum.TokenType.AccessToken, hashedAccessToken, tokens.ExpirationDate, accessIdentifier);
-            var dbRefreshToken = await _authRepository.InsertTokenRepository(user.UserId, PublicEnum.TokenType.RefreshToken, hashedRefreshToken, refreshTokenExpirationDate, refreshIdentifier);
+            var dbAccessToken = await _authRepository.InsertTokenRepository(user.UserId, PublicEnum.TokenType.AccessToken, hashedAccessToken, tokens.AccessToken.ExpirationDate, accessIdentifier);
+            var dbRefreshToken = await _authRepository.InsertTokenRepository(user.UserId, PublicEnum.TokenType.RefreshToken, hashedRefreshToken, tokens.RefreshToken.ExpirationDate, refreshIdentifier);
 
             return tokens;
         }
