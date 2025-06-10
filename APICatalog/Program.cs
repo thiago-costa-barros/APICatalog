@@ -1,6 +1,8 @@
 using APICatalog.API.Filters;
+using APICatalog.API.Middlewares;
 using APICatalog.APICataolog.Data.Context;
 using APICatalog.Core.DI;
+using APICatalog.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -63,24 +65,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddDependencyInjectionConfig();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
-    };
-});
+builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddAuthorization(options =>
 { 
     options.FallbackPolicy = new AuthorizationPolicyBuilder()
@@ -99,7 +84,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+app.UseMiddleware<TokenRevocationMiddleware>();
 app.UseAuthorization();
+app.UseMiddleware<GlobalErrorHandlingMiddleware>();
 
 app.MapControllers();
 

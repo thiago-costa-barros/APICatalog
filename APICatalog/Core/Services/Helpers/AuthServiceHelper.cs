@@ -19,44 +19,87 @@ namespace APICatalog.Core.Services.Helpers
         }
         public TokenReponseDTO GenerateToken(User user)
         {
+            var requestTime = DateTime.UtcNow;
+
+            // Identificadores únicos
             var accessTokenIdentifier = Guid.NewGuid();
             var refreshTokenIdentifier = Guid.NewGuid();
 
-            var claims = new []
+            // Geração dos tokens
+            var accessToken = GenerateAccessToken(user, accessTokenIdentifier, requestTime);
+            var refreshToken = GenerateRefreshToken(user, refreshTokenIdentifier, requestTime);
+
+            TokenReponseDTO response = new TokenReponseDTO
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
-                new Claim(JwtRegisteredClaimNames.Jti, accessTokenIdentifier.ToString()),
-                new Claim(ClaimTypes.Email, user.Email ?? ""),
-                new Claim("IsAdmin", user.IsAdmin.ToString()),
-                new Claim("IsActive", user.IsActive.ToString()),
-                new Claim("Type", user.Type.ToString())
-            };
-            var secretKey = _config["Jwt:SecretKey"] ?? throw new ArgumentNullException(nameof(_config), "SecretKey cannot be null.");
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var accessTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_config["Jwt:AccessTokenExpirationMinutes"]));
-
-            var accessToken = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Audience"],
-                claims: claims,
-                expires: accessTokenExpiration,
-                signingCredentials: creds
-            );
-
-            var response = new TokenReponseDTO
-            {
-                AccessToken = new JwtSecurityTokenHandler().WriteToken(accessToken),
-                RefreshToken = Guid.NewGuid().ToString(),
-                ExpirationDate = accessToken.ValidTo,
                 UserId = user.UserId,
-                AccessIdentifier = accessTokenIdentifier,
-                RefreshIdentifier = refreshTokenIdentifier
+                RequestTime = requestTime,
+                AccessToken = new AccessTokenResponseDTO
+                {
+                    AccessIdentifier = accessTokenIdentifier,
+                    AccessToken = accessToken.Token,
+                    ExpirationDate = accessToken.Expiration
+                },
+                RefreshToken = new RefreshTokenResponseDTO
+                {
+                    RefreshIdentifier = refreshTokenIdentifier,
+                    RefreshToken = refreshToken.Token,
+                    ExpirationDate = refreshToken.Expiration
+                }
             };
 
 
             return response;
+        }
+        private (string Token, DateTime Expiration) GenerateAccessToken(User user, Guid jti, DateTime now)
+        {
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, jti.ToString()),
+                new Claim(ClaimTypes.Email, user.Email ?? ""),
+                new Claim("IsAdmin", user.IsAdmin.ToString()),
+                new Claim("IsActive", user.IsActive.ToString()),
+                new Claim("Type", user.Type.ToString()),
+                new Claim("typ", "access")
+            };
+
+            var expiration = now.AddMinutes(Convert.ToDouble(_config["Jwt:AccessTokenExpirationMinutes"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:SecretKey"]!));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                claims: claims,
+                expires: expiration,
+                signingCredentials: creds
+            );
+
+            return (new JwtSecurityTokenHandler().WriteToken(token), expiration);
+        }
+
+        private (string Token, DateTime Expiration) GenerateRefreshToken(User user, Guid jti, DateTime now)
+        {
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, jti.ToString()),
+                new Claim("typ", "refresh")
+            };
+
+            var expiration = now.AddDays(Convert.ToDouble(_config["Jwt:RefreshTokenExpirationDays"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:RefreshKey"]!));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                claims: claims,
+                expires: expiration,
+                signingCredentials: creds
+            );
+
+            return (new JwtSecurityTokenHandler().WriteToken(token), expiration);
         }
 
         public string HashToken(string token)
