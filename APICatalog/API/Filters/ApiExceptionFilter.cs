@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.ComponentModel.DataAnnotations;
 
 namespace APICatalog.API.Filters
 {
@@ -13,16 +14,33 @@ namespace APICatalog.API.Filters
 
         public void OnException(ExceptionContext context)
         {
-            _logger.LogError(context.Exception, "An generic error occurred while processing the request.");
-            context.Result = new ObjectResult(new
+            var exception = context.Exception;
+            var statusCode = exception switch
+            {
+                UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
+                ValidationException => StatusCodes.Status400BadRequest,
+                ArgumentNullException => StatusCodes.Status400BadRequest,
+                ArgumentException => StatusCodes.Status400BadRequest,
+                KeyNotFoundException => StatusCodes.Status404NotFound,
+                NotImplementedException => StatusCodes.Status501NotImplemented,
+                _ => StatusCodes.Status500InternalServerError
+            };
+
+            var response = new
             {
                 Success = false,
-                StatusCode = StatusCodes.Status500InternalServerError,
+                StatusCode = statusCode,
                 RequestTime = DateTime.UtcNow,
-                Message = "An error occurred while processing your request. Please try again later."
-            })
+                ErrorType = exception.GetType().Name,
+                Message = exception.Message
+            };
+
+            _logger.LogError(exception, "Exception caught by ApiExceptionFilter.");
+
+
+            context.Result = new ObjectResult(response)
             {
-                StatusCode = StatusCodes.Status500InternalServerError
+                StatusCode = statusCode
             };
         }
     }

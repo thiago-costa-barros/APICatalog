@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.16" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
       <PrivateAssets>all</PrivateAssets>
@@ -15,12 +17,20 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.4" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageReference Include="Scrutor" Version="6.0.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="API\Middlewares\" />
-    <Folder Include="Core\Services\" />
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Update="Core\Common\Resources\UserMessages.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>UserMessages.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<Compile Update="Core\Common\Resources\UserMessages.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>UserMessages.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
 
 </Project>
