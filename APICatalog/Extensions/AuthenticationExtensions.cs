@@ -10,6 +10,7 @@ namespace APICatalog.Extensions
     {
         public static AuthenticationBuilder AddJwtAuthentication(this IServiceCollection services, IConfiguration config)
         {
+            var secretKey = config["Jwt:SecretKey"] ?? throw new ArgumentException("Invalid Secret Key!");
             return services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -25,7 +26,7 @@ namespace APICatalog.Extensions
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = config["Jwt:Issuer"],
                     ValidAudience = config["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:SecretKey"]))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
                 };
 
                 options.Events = TokenVerifyHandler.GetEvents();
