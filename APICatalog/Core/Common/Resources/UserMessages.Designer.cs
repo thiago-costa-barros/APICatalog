@@ -22,7 +22,7 @@ namespace APICatalog.Core.Common.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class UserMessages {
+    internal class UserMessages {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
