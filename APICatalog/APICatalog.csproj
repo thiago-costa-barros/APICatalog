@@ -20,10 +20,6 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="API\Middlewares\" />
-  </ItemGroup>
-
 	<ItemGroup>
 		<EmbeddedResource Update="Core\Common\Resources\UserMessages.resx">
 			<Generator>ResXFileCodeGenerator</Generator>
